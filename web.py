@@ -7,12 +7,15 @@ import shutil
 import logging
 import uuid
 from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask_cors import CORS
 import app
 import publisher
+import blog_publisher
 import path_utils
 
 # Initialize Flask
 app_server = Flask(__name__, static_folder='static', template_folder='templates')
+CORS(app_server)  # Enable CORS for GitHub Pages frontend
 
 # Configure paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -56,6 +59,7 @@ def save_and_generate():
         data = request.json
         filename = data.get('filename', 'untitled').strip()
         session_id = data.get('session_id', '').strip()
+        theme = data.get('theme', 'black_gold').strip() # Get theme
         if not filename: filename = 'untitled'
         content = data.get('content', '')
         
@@ -71,9 +75,9 @@ def save_and_generate():
             f.write(content)
             
         # Run Generator
-        print(f"Generating for: {md_file} (Session: {session_id})")
-        # Call app.main with isolated paths
-        app.main(target_md=md_file, input_dir=input_dir, output_dir=output_dir)
+        print(f"Generating for: {md_file} (Session: {session_id}, Theme: {theme})")
+        # Call app.main with isolated paths and theme
+        app.main(target_md=md_file, input_dir=input_dir, output_dir=output_dir, theme=theme)
         
         # Find the preview HTML
         output_folder = os.path.join(output_dir, filename)
@@ -163,6 +167,37 @@ def upload_image():
         filename = file.filename
         file.save(os.path.join(input_dir, filename))
         return jsonify({'status': 'success', 'filename': filename})
+
+import threading
+
+@app_server.route('/api/publish_blog', methods=['POST'])
+def publish_blog():
+    """Publish to local Next.js Blog and Deploy to Vercel."""
+    try:
+        data = request.json
+        content = data.get('content', '')
+        filename = data.get('filename', 'Untitled').strip()
+        if not filename: filename = 'Untitled'
+        author = data.get('author_name', 'Hugo')
+        
+        # 1. Write file locally
+        path = blog_publisher.publish_to_blog(filename, content, author)
+        
+        # 2. Trigger GitHub Sync in Background
+        def run_deploy():
+            blog_publisher.deploy_to_github(commit_message=f"Post: {filename}")
+            
+        threading.Thread(target=run_deploy).start()
+        
+        return jsonify({
+            "status": "success", 
+            "message": f"Saved to {path}. 🚀 Syncing to GitHub...", 
+            "path": path
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
     print("🚀 Writer Studio Web Server (Cloud Mode) starting at http://localhost:5001")
