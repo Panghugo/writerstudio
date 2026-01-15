@@ -1,4 +1,17 @@
-requirements.txt
-Dockerfile
-.dockerignore
-docker-compose.yml
+# Git
+.git
+.gitignore
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Mac
+.DS_Store
+
+# App Data (Keep container stateless)
+/input/*
+/output/*
+/temp_sessions/*
+/config.json
