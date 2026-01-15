@@ -24,6 +24,7 @@ RUN mkdir -p input output temp_sessions
 # Expose port (5000 is default Flask, we use 5001 usually but cloud uses PORT env)
 ENV PORT=8080
 EXPOSE 8080
+ENV PYTHONUNBUFFERED=1
 
-# Run with Gunicorn
-CMD ["sh", "-c", "gunicorn web:app_server --bind 0.0.0.0:$PORT --workers 4 --timeout 120"]
+# Run with Gunicorn (1 worker to save memory)
+CMD ["sh", "-c", "gunicorn web:app_server --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --log-level debug"]
