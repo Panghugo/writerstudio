@@ -3,6 +3,9 @@
 A powerful, aesthetic article layout generator and editor for WeChat Official Accounts.
 Now available as a Cloud-Ready Web Application.
 
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/IBPWB0)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
 ![Preview](https://via.placeholder.com/800x400?text=Writer+Studio+Preview)
 
 ## Features
