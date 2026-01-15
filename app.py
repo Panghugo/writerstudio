@@ -22,25 +22,71 @@ def run_generator(target_md=None):
     main(target_md)
 
 # ================= 🎨 视觉风格配置室 =================
-STYLE = {
-    "canvas_width": 1080,
-    "bg_color": "#FFFFFF",
-    "font_name": "songti",
-    "cover_ratio": 2.35, "cover_bg_color": "#141414", "cover_text_color": "#E6C35C", 
-    "cover_main_size": 130, "cover_footer_size": 32, "cover_margin": 80,            
-    "header_ratio": 0.75, "header_bg_color": "#1A1A1A", "header_text_color": "#E6C35C", 
-    "header_main_size": 100, "header_sub_size": 48, "header_footer_size": 32, "header_margin": 80,           
-    "footer_height": 500, "footer_bg_color": "#141414", "footer_gold": "#E6C35C",      
-    "brand_name": "随时上场", "brand_en": "THE ARENA", "brand_slogan": "商业观察  /  组织重构  /  AI 进化",
-    "author_text": "文 / 君泽", 
-    "h_bg_color": "#FFFFFF", "h_font_size": 52, "h_color": "#222222", 
-    "h_padding_top": 110, "h_padding_bottom": 110,
-    "h_num_radius": 38, "h_num_color": "#E6C35C", "h_num_font_size": 40, "h_text_gap": 45,
-    "gif_frames": 16, "gif_duration": 100,       
-    "q_bg_color": "#FFFFFF", "q_text_color": "#333333", "q_line_color": "#000000", 
-    "q_font_size": 46, "q_padding_x": 120, "q_line_spacing": 35, "q_deco_gap": 100, "q_deco_width": 80,
-    "q_radius": 20, "q_fold_size": 60
+# ================= 🎨 视觉风格配置室 =================
+THEMES = {
+    "black_gold": {
+        "bg_color": "#FFFFFF", "font_name": "songti",
+        "cover_ratio": 2.35, "cover_bg_color": "#141414", "cover_text_color": "#E6C35C", 
+        "cover_main_size": 130, "cover_footer_size": 32, "cover_margin": 80,            
+        "header_ratio": 0.75, "header_bg_color": "#1A1A1A", "header_text_color": "#E6C35C", 
+        "header_main_size": 100, "header_sub_size": 48, "header_footer_size": 32, "header_margin": 80,           
+        "footer_height": 500, "footer_bg_color": "#141414", "footer_gold": "#E6C35C",      
+        "brand_name": "随时上场", "brand_en": "THE ARENA", "brand_slogan": "商业观察  /  组织重构  /  AI 进化",
+        "author_text": "文 / 君泽", 
+        "h_bg_color": "#FFFFFF", "h_font_size": 52, "h_color": "#222222", 
+        "h_padding_top": 110, "h_padding_bottom": 110,
+        "h_num_radius": 38, "h_num_color": "#E6C35C", "h_num_font_size": 40, "h_text_gap": 45,
+        "gif_frames": 16, "gif_duration": 100,       
+        "q_bg_color": "#FFFFFF", "q_text_color": "#333333", "q_line_color": "#000000", 
+        "q_font_size": 46, "q_padding_x": 120, "q_line_spacing": 35, "q_deco_gap": 100, "q_deco_width": 80,
+        "q_radius": 20, "q_fold_size": 60
+    },
+    "tech_blue": {
+        "bg_color": "#F0F4F8", "font_name": "songti",
+        "cover_ratio": 2.35, "cover_bg_color": "#0F172A", "cover_text_color": "#38BDF8", 
+        "cover_main_size": 130, "cover_footer_size": 32, "cover_margin": 80,            
+        "header_ratio": 0.75, "header_bg_color": "#1E293B", "header_text_color": "#38BDF8", 
+        "header_main_size": 100, "header_sub_size": 48, "header_footer_size": 32, "header_margin": 80,           
+        "footer_height": 500, "footer_bg_color": "#0F172A", "footer_gold": "#38BDF8",      
+        "brand_name": "未来科技", "brand_en": "FUTURE TECH", "brand_slogan": "深度  /  前沿  /  洞察",
+        "author_text": "文 / 君泽", 
+        "h_bg_color": "#F8FAFC", "h_font_size": 52, "h_color": "#0F172A", 
+        "h_padding_top": 110, "h_padding_bottom": 110,
+        "h_num_radius": 38, "h_num_color": "#0EA5E9", "h_num_font_size": 40, "h_text_gap": 45,
+        "gif_frames": 16, "gif_duration": 100,       
+        "q_bg_color": "#F1F5F9", "q_text_color": "#0F172A", "q_line_color": "#38BDF8", 
+        "q_font_size": 46, "q_padding_x": 120, "q_line_spacing": 35, "q_deco_gap": 100, "q_deco_width": 80,
+        "q_radius": 20, "q_fold_size": 60
+    },
+    "paper_white": {
+        "bg_color": "#FAF9F6", "font_name": "songti",
+        "cover_ratio": 2.35, "cover_bg_color": "#FFFFFF", "cover_text_color": "#000000", 
+        "cover_main_size": 130, "cover_footer_size": 32, "cover_margin": 80,            
+        "header_ratio": 0.75, "header_bg_color": "#FFFFFF", "header_text_color": "#000000", 
+        "header_main_size": 100, "header_sub_size": 48, "header_footer_size": 32, "header_margin": 80,           
+        "footer_height": 500, "footer_bg_color": "#FFFFFF", "footer_gold": "#000000",      
+        "brand_name": "素年锦时", "brand_en": "PURE TIME", "brand_slogan": "阅读  /  思考  /  生活",
+        "author_text": "文 / 君泽", 
+        "h_bg_color": "#FAF9F6", "h_font_size": 52, "h_color": "#333333", 
+        "h_padding_top": 110, "h_padding_bottom": 110,
+        "h_num_radius": 38, "h_num_color": "#666666", "h_num_font_size": 40, "h_text_gap": 45,
+        "gif_frames": 16, "gif_duration": 100,       
+        "q_bg_color": "#FFFFFF", "q_text_color": "#333333", "q_line_color": "#999999", 
+        "q_font_size": 46, "q_padding_x": 120, "q_line_spacing": 35, "q_deco_gap": 100, "q_deco_width": 80,
+        "q_radius": 0, "q_fold_size": 0
+    }
 }
+
+STYLE = THEMES["black_gold"]
+
+def set_style(theme_name):
+    global STYLE
+    if theme_name in THEMES:
+        STYLE = THEMES[theme_name]
+    else:
+        STYLE = THEMES["black_gold"]
+    STYLE["canvas_width"] = 1080 # Force standard width
+
 
 # ================= 🛠️ 核心功能区 =================
 def get_font_path():
@@ -252,7 +298,9 @@ def draw_quote(text, save_path):
     img = Image.new("RGBA", (w, img_h), (0,0,0,0)) 
     img.paste(card_color_layer, mask=mask)
     d = ImageDraw.Draw(img)
-    d.text((STYLE["q_padding_x"]-40, STYLE["q_deco_gap"]-40), "“", font=qm_font, fill=STYLE["footer_gold"])
+    # Watermark Quote Mark (Grey, Transparent, Behind Text)
+    watermark_color = (200, 200, 200, 60) # RGBA: Light Grey, Low Opacity
+    d.text((STYLE["q_padding_x"]-40, STYLE["q_deco_gap"]-40), "“", font=qm_font, fill=watermark_color)
     for y in [STYLE["q_deco_gap"]-50, img_h-STYLE["q_deco_gap"]+50]:
         d.line([(w//2-STYLE["q_deco_width"], y), (w//2+STYLE["q_deco_width"], y)], fill=STYLE["q_line_color"], width=4)
         d.regular_polygon((w//2, y, 6), 4, rotation=0, fill=STYLE["q_line_color"])
@@ -311,7 +359,11 @@ def export_html_preview(md_lines, output_dir, folder_name, main_title):
     except Exception as e: 
         print(f"❌ HTML 生成失败: {e}")
 
-def main(target_md=None, input_dir="input", output_dir="output"):
+def main(target_md=None, input_dir="input", output_dir="output", theme="black_gold"):
+    # Set Theme
+    set_style(theme)
+    print(f"🎨 Theme set to: {theme}")
+
     if not os.path.exists(input_dir): os.makedirs(input_dir)
     if not os.path.exists(output_dir): os.makedirs(output_dir)
     
@@ -383,9 +435,10 @@ def main(target_md=None, input_dir="input", output_dir="output"):
             else:
                 new_con.append(line + "\n" if line else "\n")
         
-        footer_name = "FOOTER.png"
-        draw_footer_card(os.path.join(assets, footer_name), asset_dir=input_dir)
-        new_con.append(f"\n\n![](assets/{footer_name})\n")
+        # Footer has been removed as per user request
+        # footer_name = "FOOTER.png"
+        # draw_footer_card(os.path.join(assets, footer_name), asset_dir=input_dir)
+        # new_con.append(f"\n\n![](assets/{footer_name})\n")
 
         with open(os.path.join(out_dir, "FINAL_" + md_file), "w", encoding="utf-8") as f: f.writelines(new_con)
         export_html_preview(new_con, out_dir, fname, main_title)

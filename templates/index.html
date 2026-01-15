@@ -62,6 +62,17 @@
             width: 200px;
         }
 
+        .theme-select {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: #ccc;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
         .actions {
             display: flex;
             gap: 10px;
@@ -263,10 +274,18 @@
         <div>
             <input type="text" id="filename-input" class="filename-input" placeholder="Filename (e.g. article1)"
                 value="untitled">
+            <select id="theme-select" class="theme-select" onchange="saveAndGenerate()">
+                <option value="black_gold">⚫️ Black Gold</option>
+                <option value="tech_blue">🔵 Tech Blue</option>
+                <option value="paper_white">⚪️ Paper White</option>
+            </select>
         </div>
 
         <div class="actions">
             <button class="btn btn-secondary" onclick="openSettings()">⚙️ Settings</button>
+            <button class="btn btn-secondary"
+                style="background-color: #0F172A; color: #38BDF8; border: 1px solid #1E293B;"
+                onclick="publishToBlog()">🔗 Sync Blog</button>
             <button class="btn btn-secondary" onclick="publish()">🚀 Publish</button>
             <button class="btn btn-primary" onclick="saveAndGenerate()">💾 Generate</button>
         </div>
@@ -358,6 +377,15 @@ Click "Generate" to see the magic.`;
         }
         console.log("Session ID:", sessionId);
 
+        // Load Theme from LocalStorage
+        const savedTheme = localStorage.getItem('ws_theme') || 'black_gold';
+        const themeSelect = document.getElementById('theme-select');
+        themeSelect.value = savedTheme;
+
+        themeSelect.addEventListener('change', () => {
+            localStorage.setItem('ws_theme', themeSelect.value);
+        });
+
         function showNotify(msg, type = 'success') {
             const notif = document.getElementById('notification');
             notif.textContent = msg;
@@ -409,6 +437,7 @@ Click "Generate" to see the magic.`;
         async function saveAndGenerate() {
             const content = editor.value;
             const filename = filenameInput.value;
+            const theme = themeSelect.value;
 
             showNotify('Generating...', 'success');
 
@@ -416,7 +445,7 @@ Click "Generate" to see the magic.`;
                 const res = await fetch('/api/save_and_generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, filename, session_id: sessionId }) // Attach Session ID
+                    body: JSON.stringify({ content, filename, session_id: sessionId, theme: theme }) // Attach Session ID & Theme
                 });
                 const data = await res.json();
 
@@ -508,6 +537,33 @@ Click "Generate" to see the magic.`;
                 }
             } catch (e) {
                 showNotify('Publish error', 'error');
+            }
+        }
+
+        async function publishToBlog() {
+            if (!confirm('Sync this article to your personal blog (local)?')) return;
+            const content = editor.value;
+            const filename = filenameInput.value;
+            const author_name = localStorage.getItem('ws_author_name') || 'Hugo';
+
+            showNotify('Syncing to blog...', 'success');
+
+            try {
+                const res = await fetch('/api/publish_blog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, filename, author_name })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showNotify('Synced to Blog Check posts folder!');
+                    console.log("Saved to:", data.path);
+                } else {
+                    showNotify('Sync failed: ' + data.message, 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showNotify('Network error during sync', 'error');
             }
         }
 
