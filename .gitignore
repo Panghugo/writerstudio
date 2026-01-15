@@ -1,0 +1,17 @@
+# System
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Writer Studio - Dynamic Data
+input/
+output/
+temp_sessions/
+dist/
+build/
+*.spec
+config.json
