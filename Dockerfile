@@ -22,8 +22,8 @@ COPY . .
 RUN mkdir -p input output temp_sessions
 
 # Expose port (5000 is default Flask, we use 5001 usually but cloud uses PORT env)
-ENV PORT=5000
-EXPOSE 5000
+ENV PORT=8080
+EXPOSE 8080
 
 # Run with Gunicorn
 CMD ["sh", "-c", "gunicorn web:app_server --bind 0.0.0.0:$PORT --workers 4 --timeout 120"]
