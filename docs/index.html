@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writer Studio - 公众号排版工具</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --panel-bg: #2b2b2b;
+            --input-bg: #333;
+            --text-color: #fff;
+            --accent-gold: #E6C35C;
+            --accent-hover: #D4B04C;
+            --border-color: #444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'PingFang SC', 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            height: 60px;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filename-input,
+        .theme-select {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filename-input {
+            width: 200px;
+        }
+
+        .theme-select {
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 10px;
+            color: #ccc;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-gold);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: #444;
+            color: #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #555;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .editor-pane,
+        .preview-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-pane {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .toolbar {
+            height: 40px;
+            background-color: #252525;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 5px;
+        }
+
+        .tool-btn {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 3px;
+        }
+
+        .tool-btn:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        .tool-btn.gold {
+            color: var(--accent-gold);
+        }
+
+        #markdown-editor {
+            flex: 1;
+            background-color: var(--bg-color);
+            color: #e0e0e0;
+            border: none;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: none;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            outline: none;
+        }
+
+        #preview-frame {
+            flex: 1;
+            border: none;
+            background-color: white;
+            width: 100%;
+            height: 100%;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            color: white;
+            border-radius: 4px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+        }
+
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--accent-gold);
+            color: black;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            transform: translateY(10px);
+        }
+
+        #notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="brand">
+            <span>✍️ Writer Studio</span>
+            <span
+                style="font-size: 12px; color: #666; border: 1px solid #444; padding: 2px 6px; border-radius: 4px;">PUBLIC</span>
+        </div>
+        <div>
+            <input type="text" id="filename-input" class="filename-input" placeholder="Filename" value="untitled">
+            <select id="theme-select" class="theme-select">
+                <option value="black_gold">⚫️ Black Gold</option>
+                <option value="tech_blue">🔵 Tech Blue</option>
+                <option value="paper_white">⚪️ Paper White</option>
+            </select>
+        </div>
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="openSettings()">⚙️ Settings</button>
+            <button class="btn btn-secondary" onclick="publish()">🚀 Publish</button>
+            <button class="btn btn-primary" onclick="saveAndGenerate()">💾 Generate</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="editor-pane">
+            <div class="toolbar">
+                <button class="tool-btn" onclick="insertFormat('# ')">H1</button>
+                <button class="tool-btn" onclick="insertFormat('## ')">H2</button>
+                <button class="tool-btn" onclick="insertFormat('**', '**')">Bold</button>
+                <button class="tool-btn" onclick="insertFormat('> ')">Quote</button>
+                <div style="width: 1px; height: 20px; background: #444; margin: 0 5px;"></div>
+                <button class="tool-btn gold" onclick="document.getElementById('img-upload').click()">+ Image</button>
+                <input type="file" id="img-upload" style="display: none;" accept="image/*" onchange="uploadImage(this)">
+            </div>
+            <textarea id="markdown-editor" placeholder="Start writing here... Use Markdown."></textarea>
+        </div>
+
+        <div class="preview-pane">
+            <div id="empty-preview" class="empty-state">
+                <div style="font-size: 40px; opacity: 0.3;">📄</div>
+                <div>Preview will appear here after generation</div>
+            </div>
+            <iframe id="preview-frame" style="display:none;"></iframe>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h2>Settings</h2>
+            <div class="form-group">
+                <label>WeChat AppID</label>
+                <input type="text" id="st-appid" placeholder="wx...">
+            </div>
+            <div class="form-group">
+                <label>AppSecret</label>
+                <input type="password" id="st-secret">
+            </div>
+            <div class="form-group">
+                <label>Author Name</label>
+                <input type="text" id="st-author" placeholder="Your Name">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification">Action Successful!</div>
+
+    <script>
+        // Backend API URL (Railway)
+        const API_BASE_URL = 'https://athletic-emotion-production.up.railway.app';
+
+        const editor = document.getElementById('markdown-editor');
+        const previewFrame = document.getElementById('preview-frame');
+        const emptyPreview = document.getElementById('empty-preview');
+        const filenameInput = document.getElementById('filename-input');
+        const themeSelect = document.getElementById('theme-select');
+
+        editor.value = `# Welcome to Writer Studio
+
+Here is your public web-based editor.
+
+## Features
+- **Markdown** Support
+- Instant **HTML Preview**
+- WeChat Publishing
+- Multiple Themes
+
+> "Simplicity is the ultimate sophistication."
+
+Click "Generate" to see the magic.`;
+
+        function uuidv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        let sessionId = localStorage.getItem('ws_session_id');
+        if (!sessionId) {
+            sessionId = uuidv4();
+            localStorage.setItem('ws_session_id', sessionId);
+        }
+
+        const savedTheme = localStorage.getItem('ws_theme') || 'black_gold';
+        themeSelect.value = savedTheme;
+        themeSelect.addEventListener('change', () => {
+            localStorage.setItem('ws_theme', themeSelect.value);
+        });
+
+        function showNotify(msg, type = 'success') {
+            const notif = document.getElementById('notification');
+            notif.textContent = msg;
+            notif.style.backgroundColor = type === 'error' ? '#ff4d4f' : '#E6C35C';
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        function insertFormat(prefix, suffix = '') {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const text = editor.value;
+            const before = text.substring(0, start);
+            const sel = text.substring(start, end);
+            const after = text.substring(end);
+            editor.value = before + prefix + sel + suffix + after;
+            editor.focus();
+            editor.selectionStart = start + prefix.length;
+            editor.selectionEnd = end + prefix.length;
+        }
+
+        async function uploadImage(input) {
+            if (input.files && input.files[0]) {
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+                formData.append('session_id', sessionId);
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/upload_image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        insertFormat(`![image](${data.filename})`);
+                        showNotify('Image uploaded!');
+                    } else {
+                        showNotify('Upload failed', 'error');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showNotify('Error uploading image', 'error');
+                }
+            }
+            input.value = '';
+        }
+
+        async function saveAndGenerate() {
+            const content = editor.value;
+            const filename = filenameInput.value;
+            const theme = themeSelect.value;
+
+            showNotify('Generating...', 'success');
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/save_and_generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, filename, session_id: sessionId, theme: theme })
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    showNotify('Generated Successfully!');
+                    emptyPreview.style.display = 'none';
+                    previewFrame.style.display = 'block';
+                    previewFrame.src = `${API_BASE_URL}${data.preview_url}?t=${new Date().getTime()}`;
+                } else {
+                    showNotify(data.message || 'Generation failed', 'error');
+                }
+            } catch (e) {
+                showNotify('Network error', 'error');
+            }
+        }
+
+        const modal = document.getElementById('settings-modal');
+
+        function openSettings() {
+            document.getElementById('st-appid').value = localStorage.getItem('ws_app_id') || '';
+            document.getElementById('st-secret').value = localStorage.getItem('ws_app_secret') || '';
+            document.getElementById('st-author').value = localStorage.getItem('ws_author_name') || '';
+            modal.style.display = 'flex';
+        }
+        function closeSettings() { modal.style.display = 'none'; }
+        function saveSettings() {
+            const app_id = document.getElementById('st-appid').value.trim();
+            const app_secret = document.getElementById('st-secret').value.trim();
+            const author_name = document.getElementById('st-author').value.trim();
+            localStorage.setItem('ws_app_id', app_id);
+            localStorage.setItem('ws_app_secret', app_secret);
+            localStorage.setItem('ws_author_name', author_name);
+            showNotify('Settings saved to browser!');
+            closeSettings();
+        }
+
+        async function publish() {
+            if (!confirm('Confirm publish to WeChat Drafts?')) return;
+            const filename = filenameInput.value;
+            const app_id = localStorage.getItem('ws_app_id');
+            const app_secret = localStorage.getItem('ws_app_secret');
+            const author_name = localStorage.getItem('ws_author_name');
+
+            if (!app_id || !app_secret) {
+                alert("Please set AppID and AppSecret in Settings first!");
+                openSettings();
+                return;
+            }
+
+            showNotify('Publishing...', 'success');
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/publish`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename, session_id: sessionId, app_id, app_secret, author_name })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showNotify('Published to WeChat!');
+                } else {
+                    showNotify(data.message, 'error');
+                }
+            } catch (e) {
+                showNotify('Publish error', 'error');
+            }
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveAndGenerate();
+            }
+        });
+    </script>
+</body>
+
+</html>
