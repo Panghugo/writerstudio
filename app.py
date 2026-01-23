@@ -32,7 +32,7 @@ THEMES = {
         "header_main_size": 100, "header_sub_size": 48, "header_footer_size": 32, "header_margin": 80,           
         "footer_height": 500, "footer_bg_color": "#141414", "footer_gold": "#E6C35C",      
         "brand_name": "随时上场", "brand_en": "THE ARENA", "brand_slogan": "商业观察  /  组织重构  /  AI 进化",
-        "author_text": "文 / 君泽", 
+        "author_text": "文 / {author}", 
         "h_bg_color": "#FFFFFF", "h_font_size": 52, "h_color": "#222222", 
         "h_padding_top": 110, "h_padding_bottom": 110,
         "h_num_radius": 38, "h_num_color": "#E6C35C", "h_num_font_size": 40, "h_text_gap": 45,
@@ -49,7 +49,7 @@ THEMES = {
         "header_main_size": 100, "header_sub_size": 48, "header_footer_size": 32, "header_margin": 80,           
         "footer_height": 500, "footer_bg_color": "#0F172A", "footer_gold": "#38BDF8",      
         "brand_name": "未来科技", "brand_en": "FUTURE TECH", "brand_slogan": "深度  /  前沿  /  洞察",
-        "author_text": "文 / 君泽", 
+        "author_text": "文 / {author}", 
         "h_bg_color": "#F8FAFC", "h_font_size": 52, "h_color": "#0F172A", 
         "h_padding_top": 110, "h_padding_bottom": 110,
         "h_num_radius": 38, "h_num_color": "#0EA5E9", "h_num_font_size": 40, "h_text_gap": 45,
@@ -66,7 +66,7 @@ THEMES = {
         "header_main_size": 100, "header_sub_size": 48, "header_footer_size": 32, "header_margin": 80,           
         "footer_height": 500, "footer_bg_color": "#FFFFFF", "footer_gold": "#000000",      
         "brand_name": "素年锦时", "brand_en": "PURE TIME", "brand_slogan": "阅读  /  思考  /  生活",
-        "author_text": "文 / 君泽", 
+        "author_text": "文 / {author}", 
         "h_bg_color": "#FAF9F6", "h_font_size": 52, "h_color": "#333333", 
         "h_padding_top": 110, "h_padding_bottom": 110,
         "h_num_radius": 38, "h_num_color": "#666666", "h_num_font_size": 40, "h_text_gap": 45,
@@ -146,7 +146,9 @@ def draw_cover(text, save_path):
     add_film_grain(img).save(save_path)
 
 def draw_header(text, save_path, read_time_mins, asset_dir="input"):
-    global SPECIFIC_FEATURE_NAME 
+    global SPECIFIC_FEATURE_NAME
+    # Reset SPECIFIC_FEATURE_NAME to ensure we check for latest feature image
+    SPECIFIC_FEATURE_NAME = None
     w, h = STYLE["canvas_width"], int(STYLE["canvas_width"] / STYLE["header_ratio"])
     main_font_size, sub_font_size = STYLE["header_main_size"], STYLE["header_sub_size"]
     font_footer = load_font(STYLE["header_footer_size"])
@@ -359,10 +361,15 @@ def export_html_preview(md_lines, output_dir, folder_name, main_title):
     except Exception as e: 
         print(f"❌ HTML 生成失败: {e}")
 
-def main(target_md=None, input_dir="input", output_dir="output", theme="black_gold"):
+def main(target_md=None, input_dir="input", output_dir="output", theme="black_gold", author_name="作者"):
     # Set Theme
     set_style(theme)
     print(f"🎨 Theme set to: {theme}")
+    
+    # Replace author placeholder with actual author name
+    if author_name and '{author}' in STYLE.get('author_text', ''):
+        STYLE['author_text'] = STYLE['author_text'].replace('{author}', author_name)
+        print(f"✍️ Author set to: {author_name}")
 
     if not os.path.exists(input_dir): os.makedirs(input_dir)
     if not os.path.exists(output_dir): os.makedirs(output_dir)

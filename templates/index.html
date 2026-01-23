@@ -258,6 +258,63 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Obsidian File Browser */
+        .obsidian-modal .modal-content {
+            width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            margin: 20px 0;
+            max-height: 400px;
+        }
+
+        .file-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-item:hover {
+            background-color: #333;
+        }
+
+        .file-name {
+            color: #fff;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .file-meta {
+            color: #888;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .search-box {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            color: white;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
     </style>
 </head>
 
@@ -301,6 +358,13 @@
                 <div style="width: 1px; height: 20px; background: #444; margin: 0 5px;"></div>
                 <button class="tool-btn gold" onclick="document.getElementById('img-upload').click()">+ Image</button>
                 <input type="file" id="img-upload" style="display: none;" accept="image/*" onchange="uploadImage(this)">
+                <button class="tool-btn" style="color: #ff6b6b; font-weight: bold;"
+                    onclick="document.getElementById('feature-upload').click()">🖼️ 头图</button>
+                <input type="file" id="feature-upload" style="display: none;" accept="image/*"
+                    onchange="uploadFeatureImage(this)">
+                <div style="width: 1px; height: 20px; background: #444; margin: 0 5px;"></div>
+                <button class="tool-btn" style="color: #9b59b6; font-weight: bold;" onclick="openObsidianBrowser()">📂 从
+                    Obsidian 加载</button>
             </div>
             <textarea id="markdown-editor" placeholder="Start writing here... Use Markdown."></textarea>
         </div>
@@ -333,6 +397,21 @@
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
                 <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
                 <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Obsidian File Browser Modal -->
+    <div id="obsidian-modal" class="modal obsidian-modal">
+        <div class="modal-content">
+            <h2>📂 从 Obsidian 加载文章</h2>
+            <input type="text" id="file-search" class="search-box" placeholder="搜索文件..." onkeyup="filterFiles()">
+            <div id="file-list-container" class="file-list">
+                <div class="loading">加载中...</div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-secondary" onclick="closeObsidianBrowser()">取消</button>
+                <button class="btn btn-secondary" onclick="loadObsidianFiles()">🔄 刷新</button>
             </div>
         </div>
     </div>
@@ -434,10 +513,38 @@ Click "Generate" to see the magic.`;
             input.value = ''; // reset
         }
 
+        async function uploadFeatureImage(input) {
+            if (input.files && input.files[0]) {
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
+                formData.append('session_id', sessionId);
+                formData.append('is_feature', 'true'); // Mark as feature image
+
+                try {
+                    showNotify('上传头图中...', 'success');
+                    const res = await fetch('/api/upload_image', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        showNotify('✅ 头图已上传！生成时会自动拼接到文章头部');
+                    } else {
+                        showNotify('上传失败', 'error');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showNotify('上传头图失败', 'error');
+                }
+            }
+            input.value = ''; // reset
+        }
+
         async function saveAndGenerate() {
             const content = editor.value;
             const filename = filenameInput.value;
             const theme = themeSelect.value;
+            const author_name = localStorage.getItem('ws_author_name') || '作者';
 
             showNotify('Generating...', 'success');
 
@@ -445,7 +552,7 @@ Click "Generate" to see the magic.`;
                 const res = await fetch('/api/save_and_generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, filename, session_id: sessionId, theme: theme }) // Attach Session ID & Theme
+                    body: JSON.stringify({ content, filename, session_id: sessionId, theme: theme, author_name: author_name }) // Attach Session ID & Theme & Author
                 });
                 const data = await res.json();
 
@@ -564,6 +671,98 @@ Click "Generate" to see the magic.`;
             } catch (e) {
                 console.error(e);
                 showNotify('Network error during sync', 'error');
+            }
+        }
+
+        // --- Obsidian File Browser ---
+        let obsidianFiles = [];
+
+        async function openObsidianBrowser() {
+            const modal = document.getElementById('obsidian-modal');
+            modal.style.display = 'flex';
+            await loadObsidianFiles();
+        }
+
+        function closeObsidianBrowser() {
+            const modal = document.getElementById('obsidian-modal');
+            modal.style.display = 'none';
+        }
+
+        async function loadObsidianFiles() {
+            const container = document.getElementById('file-list-container');
+            container.innerHTML = '<div class="loading">加载中...</div>';
+
+            try {
+                const res = await fetch('/api/list_obsidian_files');
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    obsidianFiles = data.files;
+                    renderFileList(obsidianFiles);
+                } else {
+                    container.innerHTML = `<div class="loading" style="color: #ff4d4f;">${data.message}</div>`;
+                }
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div class="loading" style="color: #ff4d4f;">加载失败</div>';
+            }
+        }
+
+        function renderFileList(files) {
+            const container = document.getElementById('file-list-container');
+
+            if (files.length === 0) {
+                container.innerHTML = '<div class="loading">没有找到文件</div>';
+                return;
+            }
+
+            container.innerHTML = files.map(file => `
+                <div class="file-item" onclick="loadObsidianFile('${file.name}')">
+                    <div class="file-name">📄 ${file.name}</div>
+                    <div class="file-meta">${file.modified_str} · ${formatFileSize(file.size)}</div>
+                </div>
+            `).join('');
+        }
+
+        function filterFiles() {
+            const searchTerm = document.getElementById('file-search').value.toLowerCase();
+            const filtered = obsidianFiles.filter(file =>
+                file.name.toLowerCase().includes(searchTerm)
+            );
+            renderFileList(filtered);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        async function loadObsidianFile(filename) {
+            showNotify('加载中...', 'success');
+
+            try {
+                const res = await fetch('/api/load_obsidian_file', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename, session_id: sessionId })
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    // Load content into editor
+                    editor.value = data.content;
+                    // Set filename
+                    filenameInput.value = data.filename;
+                    // Close modal
+                    closeObsidianBrowser();
+                    showNotify('✅ 文章已加载！');
+                } else {
+                    showNotify(data.message || '加载失败', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showNotify('加载失败', 'error');
             }
         }
 

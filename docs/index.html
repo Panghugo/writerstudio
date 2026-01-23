@@ -415,6 +415,7 @@ Click "Generate" to see the magic.`;
             const content = editor.value;
             const filename = filenameInput.value;
             const theme = themeSelect.value;
+            const author_name = localStorage.getItem('ws_author_name') || '作者';
 
             showNotify('Generating...', 'success');
 
@@ -422,7 +423,7 @@ Click "Generate" to see the magic.`;
                 const res = await fetch(`${API_BASE_URL}/api/save_and_generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, filename, session_id: sessionId, theme: theme })
+                    body: JSON.stringify({ content, filename, session_id: sessionId, theme: theme, author_name: author_name })
                 });
                 const data = await res.json();
 
