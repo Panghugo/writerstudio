@@ -339,16 +339,21 @@ def export_html_preview(md_lines, output_dir, folder_name, main_title):
 <div class='container'>
 """)
         
+        # Generate timestamp for cache busting
+        cache_buster = int(time.time() * 1000)
+        
         for line in md_lines:
             line = line.strip()
             if not line: continue
             
             if line.startswith("![]"):
-                # 修复图片路径
+                # 修复图片路径并添加缓存破坏参数
                 match = re.search(r'\((.*?)\)', line)
                 if match: 
                     img_path = match.group(1)
-                    html_content.append(f'<img src="{img_path}" alt="图片" />')
+                    # Add cache-busting parameter to prevent browser caching
+                    img_url = f"{img_path}?t={cache_buster}"
+                    html_content.append(f'<img src="{img_url}" alt="图片" />')
             else:
                 # 处理加粗文字 **文字** -> 金色样式
                 processed_line = re.sub(r'\*\*(.+?)\*\*', r'<span class="bold-text">\1</span>', line)
