@@ -1,0 +1,1 @@
+"""Writer Studio application helpers."""

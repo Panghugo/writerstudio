@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.writerstudio.webserver</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-lc</string>
+        <string>cd SCRIPT_PATH_PLACEHOLDER &amp;&amp; exec SCRIPT_PATH_PLACEHOLDER/venv/bin/python3 -u SCRIPT_PATH_PLACEHOLDER/web.py</string>
+    </array>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+    
+    <key>StandardOutPath</key>
+    <string>HOME_PATH_PLACEHOLDER/Library/Logs/WriterStudio/web_server_stdout.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>HOME_PATH_PLACEHOLDER/Library/Logs/WriterStudio/web_server_stderr.log</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+</dict>
+</plist>

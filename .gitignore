@@ -11,6 +11,8 @@ venv/
 input/
 output/
 temp_sessions/
+*.log
+qtest.png
 dist/
 build/
 *.spec
