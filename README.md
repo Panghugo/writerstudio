@@ -26,6 +26,7 @@ http://localhost:5001
 - `static/css/app.css`：样式。
 - `static/js/dom.js`：页面元素引用。
 - `static/js/editor.js`：编辑器文本格式插入。
+- `static/js/generation.js`：保存 Markdown 并生成预览。
 - `static/js/notifications.js`：顶部通知提示。
 - `static/js/api.js`：后端 API 封装。
 - `static/js/app.js`：前端入口和 UI 协调。

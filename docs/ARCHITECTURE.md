@@ -165,6 +165,12 @@ static/js/editor.js
 Editor text helpers, including toolbar-driven Markdown insertion.
 
 ```text
+static/js/generation.js
+```
+
+Save-and-generate preview flow. It gathers editor state, calls the backend generation API, updates preview visibility, and reports generation errors through the injected notifier.
+
+```text
 static/js/notifications.js
 ```
 
@@ -203,7 +209,7 @@ Frontend entrypoint and UI coordinator. It owns:
 - session/theme initialization
 - module configuration
 - event binding
-- generate-preview UI updates
+- generate-preview event dispatch
 
 ## Dynamic Data
 

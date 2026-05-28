@@ -1,6 +1,7 @@
 const api = window.WriterStudioApi;
 const dom = window.WriterStudioDom;
 const editor = window.WriterStudioEditor;
+const generation = window.WriterStudioGeneration;
 const notifications = window.WriterStudioNotifications;
 const settings = window.WriterStudioSettings;
 const publishing = window.WriterStudioPublishing;
@@ -69,13 +70,13 @@ function configureModules() {
 function bindEvents() {
     dom.themeSelect.addEventListener('change', () => {
         localStorage.setItem('ws_theme', dom.themeSelect.value);
-        saveAndGenerate();
+        generatePreview();
     });
 
     document.addEventListener('keydown', event => {
         if ((event.ctrlKey || event.metaKey) && event.key === 's') {
             event.preventDefault();
-            saveAndGenerate();
+            generatePreview();
         }
     });
 
@@ -107,7 +108,7 @@ function bindEvents() {
         });
     });
 
-    dom.generateBtn.addEventListener('click', saveAndGenerate);
+    dom.generateBtn.addEventListener('click', generatePreview);
     dom.obsidianOpenBtn.addEventListener('click', obsidian.open);
     dom.obsidianCloseBtn.addEventListener('click', obsidian.close);
     dom.obsidianRefreshBtn.addEventListener('click', obsidian.refresh);
@@ -141,28 +142,12 @@ function insertEditorFormat(prefix, suffix = '') {
     editor.insertFormat(dom.editor, prefix, suffix);
 }
 
-async function saveAndGenerate() {
-    showNotify('Generating...', 'success');
-
-    try {
-        const data = await api.saveAndGenerate({
-            content: dom.editor.value,
-            filename: dom.filenameInput.value,
-            session_id: sessionId,
-            theme: dom.themeSelect.value,
-            author_name: settings.getAuthorName('作者')
-        });
-
-        if (data.status === 'success') {
-            showNotify('Generated Successfully!');
-            dom.emptyPreview.style.display = 'none';
-            dom.previewFrame.style.display = 'block';
-            dom.previewFrame.src = data.preview_url + '?t=' + Date.now();
-        } else {
-            showNotify(data.message || 'Generation failed', 'error');
-        }
-    } catch (e) {
-        console.error(e);
-        showNotify('Network error', 'error');
-    }
+function generatePreview() {
+    generation.saveAndGenerate({
+        api,
+        dom,
+        settings,
+        sessionId,
+        notify: showNotify
+    });
 }
