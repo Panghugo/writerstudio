@@ -115,12 +115,7 @@ cp config.template.json config.json
 - `scripts/smoke_test.py`：Web 生成链路烟测。
 - `scripts/check_text_formatting.py`：文本格式化检查。
 - `scripts/check_publisher_offline.py`：公众号发布离线回归检查。
-
-前端 JavaScript 语法检查：
-
-```bash
-node --check static/js/*.js
-```
+- `node --check static/js/*.js`：前端 JavaScript 语法检查；如果本机没有 `node`，会提示并跳过。
 
 ## 常见问题
 

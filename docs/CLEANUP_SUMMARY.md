@@ -166,7 +166,7 @@ Use these before continuing larger refactors:
 ./venv/bin/python3 scripts/check_all.py
 ```
 
-`check_all.py` runs compile checks, smoke tests, text formatting checks, and the offline publisher check.
+`check_all.py` runs compile checks, smoke tests, text formatting checks, the offline publisher check, and frontend JavaScript syntax checks when Node.js is available.
 
 Optional live API check:
 

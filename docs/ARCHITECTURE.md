@@ -246,6 +246,8 @@ Run these after structural changes:
 ./venv/bin/python3 scripts/check_all.py
 ```
 
+This includes Python compile checks, smoke checks, text formatting checks, offline WeChat publisher checks, and `node --check` for `static/js/*.js` when Node.js is available.
+
 For live API verification:
 
 ```bash
