@@ -136,12 +136,12 @@ Auto_All.command
 Start_App.command
 WriterStudio_GUI.py
 blog_publisher.py
-build_app.command
 run.command
-test_editor.py
 ```
 
 They now either delegate to the new Web/script entrypoints or print a clear retirement message for the old desktop GUI/editor flow.
+
+The retired `build_app.command` and `test_editor.py` wrappers were removed after the legacy entrypoint audit found no runtime references.
 
 See `docs/LEGACY_ENTRYPOINTS.md` for the current keep/deprecate/delete-later audit.
 

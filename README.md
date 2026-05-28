@@ -165,9 +165,7 @@ qtest.png
 - `Start_App.command`
 - `WriterStudio_GUI.py`
 - `blog_publisher.py`
-- `build_app.command`
 - `run.command`
-- `test_editor.py`
 
 新代码优先使用 `writer_studio/` 内的模块。
 

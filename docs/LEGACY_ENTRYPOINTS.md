@@ -38,19 +38,24 @@ These are old desktop/script entrypoints. They now either delegate to the web ap
 | --- | --- | --- |
 | `Start_App.command` | Prints a web-app message and delegates to `Start_Web.command`. | Keep for old desktop shortcut compatibility. |
 | `WriterStudio_GUI.py` | Prints that the desktop GUI was replaced, then starts the Flask app on port `5001`. | Keep for now; consider changing it to delegate to `web.py` only if duplication becomes annoying. |
-| `build_app.command` | Prints that the legacy desktop build is retired. | Keep until old build shortcuts are confirmed unused. |
-| `test_editor.py` | Prints that the old tkinter editor test is retired. | Candidate for deletion after one more cleanup pass. |
 | `Auto_All.command` | Delegates to `scripts/Auto_All.command`. | Keep only if the old all-in-one terminal workflow is still useful. |
 | `run.command` | Prints a legacy CLI message, then runs `app.py` with project Python when available. | Keep only if direct generation from `input/` to `output/` is still useful outside the web UI. |
 | `scripts/Auto_All.command` | Prints a legacy CLI message, runs `app.py`, then interactive `publisher.py` with project Python when available. | Deprecated all-in-one CLI flow; keep until confirmed unused. |
+
+## Removed
+
+These retired wrappers were deleted after the audit found no runtime references:
+
+```text
+build_app.command
+test_editor.py
+```
 
 ## Candidate Deletions Later
 
 Do not delete these automatically. They are only candidates once old shortcuts/imports are confirmed unused:
 
 ```text
-test_editor.py
-build_app.command
 Auto_All.command
 scripts/Auto_All.command
 run.command
