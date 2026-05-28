@@ -88,6 +88,7 @@ The WeChat publishing flow is now split into:
 
 ```text
 publisher.py
+writer_studio/wechat_publisher.py
 writer_studio/wechat_client.py
 writer_studio/wechat_draft.py
 writer_studio/wechat_format.py
@@ -96,7 +97,8 @@ scripts/check_publisher_offline.py
 
 Current intent:
 
-- `publisher.py`: compatibility facade and publish orchestration.
+- `publisher.py`: compatibility facade for older imports and CLI usage.
+- `wechat_publisher.py`: publish orchestration.
 - `wechat_client.py`: WeChat API calls.
 - `wechat_draft.py`: generated asset scanning and article data assembly.
 - `wechat_format.py`: Markdown-to-WeChat HTML formatting.
@@ -161,10 +163,10 @@ config.json
 Use these before continuing larger refactors:
 
 ```bash
-./venv/bin/python3 -m compileall -q app.py web.py publisher.py writer_studio scripts/smoke_test.py
-./venv/bin/python3 scripts/smoke_test.py
-./venv/bin/python3 scripts/check_publisher_offline.py
+./venv/bin/python3 scripts/check_all.py
 ```
+
+`check_all.py` runs compile checks, smoke tests, text formatting checks, and the offline publisher check.
 
 Optional live API check:
 

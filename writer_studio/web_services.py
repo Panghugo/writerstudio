@@ -4,7 +4,6 @@ import uuid
 from urllib.parse import quote
 
 import app
-import publisher
 from scripts.plugins import blog_publisher
 
 from .config import ALLOWED_IMAGE_EXTENSIONS, ALLOWED_THEMES, load_server_config
@@ -18,6 +17,7 @@ from .obsidian import (
     list_markdown_files as list_obsidian_markdown_files,
     load_markdown_file as load_obsidian_markdown_file,
 )
+from .wechat_publisher import WeChatPublisher
 
 
 GENERATION_LOCK = threading.Lock()
@@ -97,7 +97,7 @@ def publish_wechat(data):
     _, output_dir = get_session_paths(session_id)
     folder_name = os.path.splitext(filename)[0]
 
-    uploader = publisher.WeChatPublisher(app_id, app_secret)
+    uploader = WeChatPublisher(app_id, app_secret)
     success = uploader.publish_draft(
         folder_name,
         author_name,

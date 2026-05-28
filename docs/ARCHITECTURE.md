@@ -97,7 +97,13 @@ Compatibility wrapper around the generation pipeline. Older callers can still ca
 publisher.py
 ```
 
-WeChat publishing facade. It coordinates generated output folders, client calls, draft assembly, and result handling.
+Compatibility facade for older imports and CLI usage. New code should use `writer_studio/wechat_publisher.py`.
+
+```text
+writer_studio/wechat_publisher.py
+```
+
+WeChat publishing orchestration. It coordinates generated output folders, client calls, draft assembly, and result handling.
 
 ```text
 writer_studio/wechat_draft.py
@@ -203,9 +209,12 @@ They are ignored in `.gitignore`.
 Run these after structural changes:
 
 ```bash
-./venv/bin/python3 -m compileall -q app.py web.py publisher.py writer_studio scripts/smoke_test.py
-./venv/bin/python3 scripts/smoke_test.py
-./venv/bin/python3 scripts/check_publisher_offline.py
+./venv/bin/python3 scripts/check_all.py
+```
+
+For live API verification:
+
+```bash
 curl -sS --max-time 20 -H 'Content-Type: application/json' \
   -d '{"filename":"smoke","session_id":"manual","theme":"black_gold","author_name":"Smoke","content":"# Smoke\n\nBody"}' \
   http://127.0.0.1:5001/api/save_and_generate

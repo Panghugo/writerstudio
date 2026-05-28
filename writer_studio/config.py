@@ -23,3 +23,23 @@ def load_server_config():
             return json.load(f)
     except Exception:
         return {}
+
+
+def load_publisher_config(verbose=False):
+    config = {
+        "app_id": "",
+        "app_secret": "",
+        "author_name": "",
+        "use_proxy": False,
+    }
+    if not os.path.exists(CONFIG_PATH):
+        return config
+
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            config.update(json.load(f))
+            if verbose:
+                print("✅ 已加载本地配置 (config.json)")
+    except Exception:
+        pass
+    return config

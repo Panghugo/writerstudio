@@ -1,0 +1,27 @@
+# Large directories that should not be indexed
+venv/
+dist/
+build/
+.git/
+.claude/
+__pycache__/
+temp_sessions/
+output/
+input/
+fonts/
+
+# Binary and generated files
+*.pyc
+*.pyo
+*.spec
+*.log
+*.otf
+*.ttf
+*.woff
+*.woff2
+.DS_Store
+web_server.log
+web_server_error.log
+
+# Config with secrets
+config.json

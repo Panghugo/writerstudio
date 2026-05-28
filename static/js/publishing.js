@@ -3,6 +3,11 @@ window.WriterStudioPublishing = (() => {
         if (!confirm('Confirm publish to WeChat Drafts?')) return;
 
         const { app_id, app_secret, author_name } = settings.getConfig();
+        if (!app_id || !app_secret) {
+            notify('请先在 Settings 里填写 AppID 和 AppSecret', 'error');
+            return;
+        }
+
         console.log("Publishing draft...");
         notify('Publishing...', 'success');
 
