@@ -28,9 +28,15 @@ The previous large template/script structure has been split into:
 templates/index.html
 static/css/app.css
 static/js/api.js
+static/js/dom.js
+static/js/editor.js
+static/js/generation.js
+static/js/notifications.js
 static/js/settings.js
 static/js/publishing.js
 static/js/obsidian.js
+static/js/session.js
+static/js/theme.js
 static/js/uploads.js
 static/js/app.js
 ```
@@ -40,11 +46,17 @@ The UI is intended to look the same. The change is mostly internal structure:
 - `index.html` is now structural HTML.
 - `app.css` owns UI styling.
 - `api.js` owns all frontend `fetch(...)` calls.
+- `dom.js` owns shared page element references.
+- `editor.js` owns toolbar-driven Markdown insertion.
+- `generation.js` owns the save-and-generate preview flow.
+- `notifications.js` owns toast rendering.
 - `settings.js` owns browser settings/localStorage.
 - `publishing.js` owns frontend publish actions.
 - `obsidian.js` owns the Obsidian browser modal.
+- `session.js` owns browser session ID creation/persistence.
+- `theme.js` owns theme selection persistence.
 - `uploads.js` owns image upload flows.
-- `app.js` coordinates DOM, session/theme state, events, and preview generation.
+- `app.js` coordinates initial content, module wiring, events, and preview-generation dispatch.
 
 ### Backend
 
@@ -184,15 +196,45 @@ Restart local launchd service:
 launchctl kickstart -k gui/$(id -u)/com.writerstudio.webserver
 ```
 
+## Current Checkpoints
+
+Recent cleanup checkpoints:
+
+```text
+7909538 Remove retired desktop wrapper stubs
+159ec9e Clarify legacy CLI wrappers
+5f71fac Document legacy entrypoint audit
+48a09e2 Include JavaScript syntax check in unified checks
+386641a Preserve explicit empty WeChat credentials
+386fba3 Expand offline publisher regression checks
+4ee2f5b Extract frontend session and theme state
+3626339 Extract preview generation flow
+9a5cd62 Split frontend coordinator helpers
+c5e313a Update Writer Studio README
+f3a36bc Add unified checks and slim publisher facade
+b224aea Refactor Writer Studio web architecture
+```
+
+What these checkpoints achieved:
+
+- Documented the current local Flask app workflow in `README.md`.
+- Split frontend coordination helpers out of `static/js/app.js`.
+- Moved preview generation, session, and theme state into focused modules.
+- Expanded offline WeChat publisher coverage for missing files/assets, empty credentials, invalid image paths, and token failure.
+- Fixed `WeChatPublisher` so explicit empty credentials stay empty instead of falling back to `config.json`.
+- Added frontend JavaScript syntax checking to `scripts/check_all.py`.
+- Audited legacy entrypoints, clarified deprecated CLI wrappers, and removed the retired `build_app.command` and `test_editor.py` stubs.
+
 ## Suggested Next Step
 
-Before making a commit, review the compatibility entrypoints and confirm this behavior is desired.
+Current recommended stopping point:
 
-Recommended commit grouping:
+```bash
+./venv/bin/python3 scripts/check_all.py
+```
 
-1. Frontend split and static assets.
-2. Backend app/service/logging split.
-3. Publisher split and publisher checks.
-4. Docs and launch/autostart scripts.
+If cleanup continues later, prefer one of these:
 
-If committing as one checkpoint instead, make sure the deleted legacy files are intentional.
+- Continue old-entrypoint retirement only after checking local shortcuts and launchd/Automator references.
+- Add more focused backend tests around `writer_studio/web_services.py`.
+- Leave `app.py`, `publisher.py`, and `blog_publisher.py` in place until external import compatibility is no longer needed.
