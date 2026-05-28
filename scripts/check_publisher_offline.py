@@ -153,9 +153,12 @@ def assert_missing_final_case(root):
 def assert_empty_credentials_case():
     client = WeChatClient('', '')
     token = client.ensure_token()
+    publisher = WeChatPublisher('', '', use_proxy=False)
     checks = {
         'ensure_token_returned_none': token is None,
         'reported_empty_credentials': 'AppID 或 AppSecret 为空' in client.last_error,
+        'publisher_preserves_empty_app_id': publisher.app_id == '',
+        'publisher_preserves_empty_app_secret': publisher.app_secret == '',
     }
     return {
         'case': 'empty_credentials',

@@ -15,8 +15,8 @@ PROXY_CONFIG = {
 class WeChatPublisher:
     def __init__(self, app_id=None, app_secret=None, use_proxy=None):
         config = load_publisher_config()
-        self.app_id = app_id or config["app_id"]
-        self.app_secret = app_secret or config["app_secret"]
+        self.app_id = config["app_id"] if app_id is None else app_id
+        self.app_secret = config["app_secret"] if app_secret is None else app_secret
         self.use_proxy = config["use_proxy"] if use_proxy is None else use_proxy
         self.proxies = PROXY_CONFIG if self.use_proxy else None
         self.last_error = ""
