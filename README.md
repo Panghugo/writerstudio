@@ -175,6 +175,7 @@ qtest.png
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)：当前架构地图。
 - [docs/CLEANUP_SUMMARY.md](docs/CLEANUP_SUMMARY.md)：清理记录。
+- [docs/LEGACY_ENTRYPOINTS.md](docs/LEGACY_ENTRYPOINTS.md)：旧入口盘点。
 - [docs/MIGRATION_NOTES.md](docs/MIGRATION_NOTES.md)：迁移说明。
 - [docs/LOG_ROTATION_GUIDE.md](docs/LOG_ROTATION_GUIDE.md)：日志轮转。
 - [docs/WEB_SERVER_GUIDE.md](docs/WEB_SERVER_GUIDE.md)：本地服务启动和排障。

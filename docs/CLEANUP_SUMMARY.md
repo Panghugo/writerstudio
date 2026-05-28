@@ -143,6 +143,8 @@ test_editor.py
 
 They now either delegate to the new Web/script entrypoints or print a clear retirement message for the old desktop GUI/editor flow.
 
+See `docs/LEGACY_ENTRYPOINTS.md` for the current keep/deprecate/delete-later audit.
+
 ## Ignored Runtime Data
 
 These are runtime/generated data and are ignored:
