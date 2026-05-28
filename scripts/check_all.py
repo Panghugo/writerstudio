@@ -22,6 +22,7 @@ CHECKS = [
         "scripts",
     ],
     [PYTHON, "scripts/smoke_test.py"],
+    [PYTHON, "scripts/check_web_services_offline.py"],
     [PYTHON, "scripts/check_text_formatting.py"],
     [PYTHON, "scripts/check_publisher_offline.py"],
 ]
