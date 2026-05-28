@@ -6,6 +6,8 @@ const notifications = window.WriterStudioNotifications;
 const settings = window.WriterStudioSettings;
 const publishing = window.WriterStudioPublishing;
 const obsidian = window.WriterStudioObsidian;
+const session = window.WriterStudioSession;
+const theme = window.WriterStudioTheme;
 const uploads = window.WriterStudioUploads;
 
 const DEFAULT_CONTENT = `# Welcome to Writer Studio
@@ -21,32 +23,11 @@ Here is your new web-based editor.
 
 Click "Generate" to see the magic.`;
 
-const sessionId = getOrCreateSessionId();
+const sessionId = session.getOrCreateSessionId();
 dom.editor.value = DEFAULT_CONTENT;
-initializeTheme();
+theme.initialize(dom.themeSelect);
 configureModules();
 bindEvents();
-
-function getOrCreateSessionId() {
-    const existingSession = localStorage.getItem('ws_session_id');
-    if (existingSession) return existingSession;
-
-    const nextSession = uuidv4();
-    localStorage.setItem('ws_session_id', nextSession);
-    return nextSession;
-}
-
-function uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
-function initializeTheme() {
-    dom.themeSelect.value = localStorage.getItem('ws_theme') || 'black_gold';
-}
 
 function configureModules() {
     obsidian.configure({
@@ -69,7 +50,7 @@ function configureModules() {
 
 function bindEvents() {
     dom.themeSelect.addEventListener('change', () => {
-        localStorage.setItem('ws_theme', dom.themeSelect.value);
+        theme.saveSelectedTheme(dom.themeSelect.value);
         generatePreview();
     });
 

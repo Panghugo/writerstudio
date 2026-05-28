@@ -195,6 +195,18 @@ static/js/obsidian.js
 Obsidian file browser modal, file list rendering, search, and file loading.
 
 ```text
+static/js/session.js
+```
+
+Browser session ID creation and persistence.
+
+```text
+static/js/theme.js
+```
+
+Theme selection initialization and persistence.
+
+```text
 static/js/uploads.js
 ```
 
@@ -206,7 +218,7 @@ static/js/app.js
 
 Frontend entrypoint and UI coordinator. It owns:
 
-- session/theme initialization
+- initial editor content
 - module configuration
 - event binding
 - generate-preview event dispatch

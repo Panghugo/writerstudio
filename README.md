@@ -33,6 +33,8 @@ http://localhost:5001
 - `static/js/settings.js`：设置弹窗和配置读取。
 - `static/js/publishing.js`：公众号发布和博客同步。
 - `static/js/obsidian.js`：Obsidian 文件浏览和加载。
+- `static/js/session.js`：浏览器会话 ID。
+- `static/js/theme.js`：主题选择持久化。
 - `static/js/uploads.js`：图片上传。
 
 更多结构说明见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
