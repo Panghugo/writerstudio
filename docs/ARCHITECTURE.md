@@ -153,6 +153,24 @@ static/js/api.js
 Backend API wrapper. All direct `fetch(...)` calls should stay here.
 
 ```text
+static/js/dom.js
+```
+
+Central DOM lookup map for the main page. Shared page element references should stay here instead of being re-declared in `app.js`.
+
+```text
+static/js/editor.js
+```
+
+Editor text helpers, including toolbar-driven Markdown insertion.
+
+```text
+static/js/notifications.js
+```
+
+Toast/notification rendering helpers.
+
+```text
 static/js/settings.js
 ```
 
@@ -182,11 +200,9 @@ static/js/app.js
 
 Frontend entrypoint and UI coordinator. It owns:
 
-- DOM references
 - session/theme initialization
 - module configuration
 - event binding
-- editor formatting helpers
 - generate-preview UI updates
 
 ## Dynamic Data

@@ -1,4 +1,7 @@
 const api = window.WriterStudioApi;
+const dom = window.WriterStudioDom;
+const editor = window.WriterStudioEditor;
+const notifications = window.WriterStudioNotifications;
 const settings = window.WriterStudioSettings;
 const publishing = window.WriterStudioPublishing;
 const obsidian = window.WriterStudioObsidian;
@@ -16,38 +19,6 @@ Here is your new web-based editor.
 > "Simplicity is the ultimate sophistication."
 
 Click "Generate" to see the magic.`;
-
-function qs(selector) {
-    return document.querySelector(selector);
-}
-
-function qsa(selector) {
-    return Array.from(document.querySelectorAll(selector));
-}
-
-const dom = {
-    editor: qs('#markdown-editor'),
-    previewFrame: qs('#preview-frame'),
-    emptyPreview: qs('#empty-preview'),
-    filenameInput: qs('#filename-input'),
-    notification: qs('#notification'),
-    themeSelect: qs('#theme-select'),
-    settingsOpenBtn: qs('#settings-open-btn'),
-    settingsCloseBtn: qs('#settings-close-btn'),
-    settingsSaveBtn: qs('#settings-save-btn'),
-    blogPublishBtn: qs('#blog-publish-btn'),
-    wechatPublishBtn: qs('#wechat-publish-btn'),
-    generateBtn: qs('#generate-btn'),
-    obsidianOpenBtn: qs('#obsidian-open-btn'),
-    obsidianCloseBtn: qs('#obsidian-close-btn'),
-    obsidianRefreshBtn: qs('#obsidian-refresh-btn'),
-    fileSearch: qs('#file-search'),
-    imageUploadBtn: qs('#image-upload-btn'),
-    featureUploadBtn: qs('#feature-upload-btn'),
-    imageUploadInput: qs('#img-upload'),
-    featureUploadInput: qs('#feature-upload'),
-    formatButtons: qsa('.format-btn')
-};
 
 const sessionId = getOrCreateSessionId();
 dom.editor.value = DEFAULT_CONTENT;
@@ -91,7 +62,7 @@ function configureModules() {
         api,
         sessionId,
         notify: showNotify,
-        insertFormat
+        insertFormat: insertEditorFormat
     });
 }
 
@@ -144,7 +115,7 @@ function bindEvents() {
 
     dom.formatButtons.forEach(button => {
         button.addEventListener('click', () => {
-            insertFormat(button.dataset.prefix || '', button.dataset.suffix || '');
+            insertEditorFormat(button.dataset.prefix || '', button.dataset.suffix || '');
         });
     });
 
@@ -163,26 +134,11 @@ function bindEvents() {
 }
 
 function showNotify(msg, type = 'success') {
-    dom.notification.textContent = msg;
-    dom.notification.style.backgroundColor = type === 'error' ? '#ff4d4f' : '#E6C35C';
-    dom.notification.classList.add('show');
-    setTimeout(() => dom.notification.classList.remove('show'), 3000);
+    notifications.show(dom.notification, msg, type);
 }
 
-function insertFormat(prefix, suffix = '') {
-    const start = dom.editor.selectionStart;
-    const end = dom.editor.selectionEnd;
-    const text = dom.editor.value;
-    const before = text.substring(0, start);
-    const sel = text.substring(start, end);
-    const after = text.substring(end);
-    const scrollTop = dom.editor.scrollTop;
-
-    dom.editor.value = before + prefix + sel + suffix + after;
-    dom.editor.focus();
-    dom.editor.selectionStart = start + prefix.length;
-    dom.editor.selectionEnd = end + prefix.length;
-    dom.editor.scrollTop = scrollTop;
+function insertEditorFormat(prefix, suffix = '') {
+    editor.insertFormat(dom.editor, prefix, suffix);
 }
 
 async function saveAndGenerate() {
