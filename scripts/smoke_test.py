@@ -67,6 +67,39 @@ def test_api_sanitizes_filename_and_generates_preview():
     assert_true(payload["status"] == "success", f"generation failed: {payload}")
     assert_true(".." not in payload["preview_url"], "preview URL should not contain traversal")
     assert_true("%E5%9D%8F_%E5%90%8D%E5%AD%97_script_" in payload["preview_url"], "sanitized name missing")
+    assert_true(payload["output_type"] == "wechat_article", "preview output type missing")
+    assert_true(payload["artifacts"][0]["type"] == "html", "preview artifact missing")
+
+
+def test_api_generates_social_cards_with_artifacts():
+    client = web.app_server.test_client()
+    session_id = "smoke-social-session"
+    paragraph = "梁泽祖把车停下，打开 OPPO 手机，开始理解那些用手机的人。这是一段用于测试多图输出的正文。"
+    response = client.post(
+        "/api/generate_social_image",
+        data=json.dumps({
+            "filename": "social-smoke",
+            "session_id": session_id,
+            "theme": "editorial_card",
+            "author_name": "Smoke",
+            "social_preset": "longform",
+            "content": "# 标题\n\n" + "\n\n".join([paragraph] * 18),
+        }),
+        content_type="application/json",
+    )
+    payload = response.get_json()
+    assert_true(response.status_code == 200, f"unexpected status: {response.status_code}")
+    assert_true(payload["status"] == "success", f"social generation failed: {payload}")
+    assert_true(payload["output_type"] == "social_cards", "social output type missing")
+    assert_true(payload["page_count"] == len(payload["image_urls"]), "social page count mismatch")
+    image_artifacts = [artifact for artifact in payload["artifacts"] if artifact["type"] == "image"]
+    zip_artifacts = [artifact for artifact in payload["artifacts"] if artifact["type"] == "zip"]
+    assert_true(len(image_artifacts) == len(payload["image_urls"]), "social image artifacts mismatch")
+    assert_true(len(zip_artifacts) == 1, "social zip artifact missing")
+    assert_true(payload["zip_url"] == zip_artifacts[0]["url"], "social zip URL mismatch")
+    assert_true(isinstance(payload["quality_checks"], list), "social quality checks missing")
+    assert_true(isinstance(payload["page_layout"], list), "social page layout missing")
+    assert_true(payload["social_preset"] == "longform", "social preset mismatch")
 
 
 def test_obsidian_loader_copies_local_images_and_blocks_traversal():
@@ -163,6 +196,7 @@ def test_wechat_draft_uploads_assets_and_builds_article_data():
 if __name__ == "__main__":
     test_generator_escapes_preview_html()
     test_api_sanitizes_filename_and_generates_preview()
+    test_api_generates_social_cards_with_artifacts()
     test_obsidian_loader_copies_local_images_and_blocks_traversal()
     test_publisher_reports_missing_generated_draft_before_network()
     test_wechat_format_escapes_content_and_renders_images()

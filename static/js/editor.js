@@ -13,6 +13,7 @@ window.WriterStudioEditor = (() => {
         editor.selectionStart = start + prefix.length;
         editor.selectionEnd = end + prefix.length;
         editor.scrollTop = scrollTop;
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     return {

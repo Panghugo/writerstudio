@@ -1,6 +1,6 @@
 import os
 
-from .wechat_format import markdown_to_wechat_html
+from .renderers.wechat_article import markdown_to_wechat_html
 
 
 UPLOADABLE_IMAGE_EXTENSIONS = ('.png', '.jpg', '.gif')

@@ -25,14 +25,23 @@ window.WriterStudioApi = (() => {
 
     return {
         uploadImage,
+        removeFeatureImage(payload) {
+            return postJson('/api/remove_feature_image', payload);
+        },
         saveAndGenerate(payload) {
             return postJson('/api/save_and_generate', payload);
+        },
+        generateSocialImage(payload) {
+            return postJson('/api/generate_social_image', payload);
         },
         publishWechat(payload) {
             return postJson('/api/publish', payload);
         },
         publishBlog(payload) {
             return postJson('/api/publish_blog', payload);
+        },
+        openOutputFolder(payload) {
+            return postJson('/api/open_output_folder', payload);
         },
         async listObsidianFiles() {
             const response = await fetch('/api/list_obsidian_files');

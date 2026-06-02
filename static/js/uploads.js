@@ -30,6 +30,7 @@ window.WriterStudioUploads = (() => {
                 const data = await context.api.uploadImage(input.files[0], context.sessionId, true);
                 if (data.status === 'success') {
                     context.notify('✅ 头图已上传！生成时会自动拼接到文章头部');
+                    if (context.onFeatureUploaded) context.onFeatureUploaded(data.filename);
                 } else {
                     context.notify('上传失败', 'error');
                 }
@@ -41,9 +42,27 @@ window.WriterStudioUploads = (() => {
         input.value = '';
     }
 
+    async function removeFeatureImage() {
+        try {
+            const data = await context.api.removeFeatureImage({
+                session_id: context.sessionId
+            });
+            if (data.status === 'success') {
+                if (context.onFeatureRemoved) context.onFeatureRemoved();
+                context.notify(data.message || '头图已移除');
+            } else {
+                context.notify(data.message || '移除头图失败', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            context.notify('移除头图失败', 'error');
+        }
+    }
+
     return {
         configure,
         uploadImage,
-        uploadFeatureImage
+        uploadFeatureImage,
+        removeFeatureImage
     };
 })();

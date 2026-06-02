@@ -83,6 +83,11 @@ window.WriterStudioObsidian = (() => {
     }
 
     async function loadFile(filename) {
+        if (context.shouldConfirmOverwrite && context.shouldConfirmOverwrite()) {
+            const ok = confirm('当前编辑区已有内容，加载 Obsidian 文件会覆盖它。要继续吗？');
+            if (!ok) return;
+        }
+
         context.notify('加载中...', 'success');
 
         try {

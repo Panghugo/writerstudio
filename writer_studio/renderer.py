@@ -1,13 +1,14 @@
 import math
 import os
-import re
 import textwrap
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
 
 import path_utils
+from .renderers.social_cards import draw_social_text_images as render_social_text_images
 from .themes import build_style
+from .typography import auto_format_text, strip_markers
 
 
 STYLE = build_style()
@@ -38,15 +39,6 @@ def load_font(size):
     return ImageFont.truetype(path, size) if path else ImageFont.load_default()
 
 
-def auto_format_text(text):
-    text = re.sub(r'["“”]([^"“”]*)["“”]', r'「\1」', text)
-    text = text.replace('“', '「').replace('”', '」')
-    text = text.replace('‘', '『').replace('’', '』')
-    text = re.sub(r'([\u4e00-\u9fa5])([*_\`]*[A-Za-z0-9])', r'\1 \2', text)
-    text = re.sub(r'([A-Za-z0-9][*_\`]*)([\u4e00-\u9fa5])', r'\1 \2', text)
-    return text
-
-
 def process_text_lines(text, max_chars=15):
     if "|" in text:
         return [line.strip() for line in text.split("|") if line.strip()]
@@ -59,10 +51,6 @@ def add_film_grain(img, intensity=0.08):
     width, height = img.size
     noise = Image.effect_noise((width, height), (intensity - 0.02) * 255).convert('RGB')
     return Image.blend(img, noise, 0.03)
-
-
-def strip_markers(text):
-    return text.replace('\x01', '')
 
 
 def draw_rich_text(draw, x, y, text_with_markers, font, base_color, accent_color, init_bold=False):
@@ -364,3 +352,18 @@ def draw_quote(text, save_path):
     draw.line([(w - fold_size, img_h), (w - fold_size, img_h - fold_size), (w, img_h - fold_size)], fill=STYLE["footer_gold"], width=1)
     draw.line([(w - fold_size, img_h), (w, img_h - fold_size)], fill="#E0E0E0", width=1)
     img.save(save_path, format="PNG")
+
+
+def draw_social_text_image(title, paragraphs, save_path):
+    page_paths = draw_social_text_images(
+        title,
+        paragraphs,
+        os.path.dirname(save_path),
+        os.path.splitext(os.path.basename(save_path))[0],
+    )
+    if page_paths and page_paths[0] != save_path:
+        os.replace(page_paths[0], save_path)
+
+
+def draw_social_text_images(title, paragraphs, output_dir, base_name):
+    return render_social_text_images(title, paragraphs, output_dir, base_name, STYLE)

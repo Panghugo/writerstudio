@@ -42,6 +42,16 @@ def register_routes(flask_app):
         except Exception as e:
             return error_response(flask_app, e, 500)
 
+    @flask_app.route('/api/generate_social_image', methods=['POST'])
+    def generate_social_image():
+        try:
+            data = request.get_json(silent=True) or {}
+            return jsonify(web_services.generate_social_image(data))
+        except ValueError as e:
+            return error_response(flask_app, e, 400)
+        except Exception as e:
+            return error_response(flask_app, e, 500)
+
     @flask_app.route('/api/publish', methods=['POST'])
     def publish():
         try:
@@ -77,11 +87,31 @@ def register_routes(flask_app):
         except ValueError as e:
             return jsonify({'error': str(e)}), 400
 
+    @flask_app.route('/api/remove_feature_image', methods=['POST'])
+    def remove_feature_image():
+        try:
+            data = request.get_json(silent=True) or {}
+            return jsonify(web_services.remove_feature_image(data))
+        except ValueError as e:
+            return error_response(flask_app, e, 400)
+        except Exception as e:
+            return error_response(flask_app, e, 500)
+
     @flask_app.route('/api/publish_blog', methods=['POST'])
     def publish_blog():
         try:
             data = request.get_json(silent=True) or {}
             return jsonify(web_services.publish_blog(data))
+        except Exception as e:
+            return error_response(flask_app, e, 500)
+
+    @flask_app.route('/api/open_output_folder', methods=['POST'])
+    def open_output_folder():
+        try:
+            data = request.get_json(silent=True) or {}
+            return jsonify(web_services.open_output_folder(data))
+        except FileNotFoundError as e:
+            return error_response(flask_app, e, 404)
         except Exception as e:
             return error_response(flask_app, e, 500)
 

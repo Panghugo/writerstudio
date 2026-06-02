@@ -12,7 +12,7 @@ TEMP_BASE_DIR = os.path.join(BASE_DIR, 'temp_sessions')
 CONFIG_PATH = os.path.join(BASE_DIR, 'config.json')
 
 ALLOWED_IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'}
-ALLOWED_THEMES = {'black_gold', 'tech_blue', 'paper_white', 'vintage_press'}
+ALLOWED_THEMES = {'black_gold', 'tech_blue', 'paper_white', 'vintage_press', 'editorial_card'}
 
 
 def load_server_config():

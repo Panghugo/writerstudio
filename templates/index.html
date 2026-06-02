@@ -13,78 +13,142 @@
 
     <header>
         <div class="brand">
-            <span>✍️ Writer Studio</span>
-            <span class="edition-badge">WEB EDITION</span>
+            <span>Writer Studio</span>
+            <span class="edition-badge">WEB</span>
         </div>
 
         <div>
-            <input type="text" id="filename-input" class="filename-input" placeholder="Filename (e.g. article1)"
+            <input type="text" id="filename-input" class="filename-input" placeholder="文件名，例如 article1"
                 value="untitled">
             <select id="theme-select" class="theme-select">
-                <option value="black_gold">⚫️ Black Gold</option>
-                <option value="tech_blue">🔵 Tech Blue</option>
-                <option value="paper_white">⚪️ Paper White</option>
-                <option value="vintage_press">📜 Vintage Press</option>
+                <option value="black_gold">黑金</option>
+                <option value="tech_blue">科技蓝</option>
+                <option value="paper_white">纸白</option>
+                <option value="vintage_press">复古报刊</option>
+                <option value="editorial_card">有限理性</option>
             </select>
         </div>
 
         <div class="actions">
-            <button id="settings-open-btn" class="btn btn-secondary">⚙️ Settings</button>
-            <button id="blog-publish-btn" class="btn btn-secondary btn-blog">🔗 Sync Blog</button>
-            <button id="wechat-publish-btn" class="btn btn-secondary">🚀 Publish</button>
-            <button id="generate-btn" class="btn btn-primary">💾 Generate</button>
+            <button id="settings-open-btn" class="btn btn-secondary">设置</button>
+            <button id="blog-publish-btn" class="btn btn-secondary btn-blog">同步博客</button>
+            <button id="wechat-publish-btn" class="btn btn-secondary">发布草稿</button>
         </div>
     </header>
 
     <div class="main-container">
         <div class="editor-pane">
             <div class="toolbar">
-                <button class="tool-btn format-btn" data-prefix="# ">H1</button>
-                <button class="tool-btn format-btn" data-prefix="## ">H2</button>
-                <button class="tool-btn format-btn" data-prefix="**" data-suffix="**">Bold</button>
-                <button class="tool-btn format-btn" data-prefix="> ">Quote</button>
-                <button class="tool-btn gold format-btn" data-prefix=">> ">✨ 金句卡片</button>
+                <button class="tool-btn format-btn" data-prefix="# ">一级标题</button>
+                <button class="tool-btn format-btn" data-prefix="## ">二级标题</button>
+                <button class="tool-btn format-btn" data-prefix="**" data-suffix="**">加粗</button>
+                <button class="tool-btn format-btn" data-prefix="> ">引用</button>
+                <button class="tool-btn gold format-btn" data-prefix=">> ">金句卡片</button>
                 <div class="toolbar-separator"></div>
-                <button id="image-upload-btn" class="tool-btn gold">+ Image</button>
+                <button id="image-upload-btn" class="tool-btn gold">图片</button>
                 <input type="file" id="img-upload" class="hidden-file-input" accept="image/*">
                 <button class="tool-btn tool-btn-feature"
-                    id="feature-upload-btn">🖼️ 头图</button>
+                    id="feature-upload-btn">头图</button>
                 <input type="file" id="feature-upload" class="hidden-file-input" accept="image/*">
+                <span id="feature-image-status" class="feature-image-status">未设置头图</span>
+                <button id="feature-remove-btn" class="tool-btn feature-remove-btn is-hidden" type="button">移除头图</button>
                 <div class="toolbar-separator"></div>
-                <button id="obsidian-open-btn" class="tool-btn tool-btn-obsidian">📂 从
-                    Obsidian 加载</button>
+                <button id="obsidian-open-btn" class="tool-btn tool-btn-obsidian">加载 Obsidian</button>
             </div>
-            <textarea id="markdown-editor" placeholder="Start writing here... Use Markdown."></textarea>
+            <textarea id="markdown-editor" placeholder="在这里写 Markdown..."></textarea>
         </div>
 
         <div class="preview-pane">
-            <div id="empty-preview" class="empty-state">
-                <div class="empty-icon">📄</div>
-                <div>Preview will appear here after generation</div>
+            <div class="output-topbar">
+                <div class="output-tabs" role="tablist" aria-label="输出模式">
+                    <button class="output-tab is-active" type="button" data-output-mode="wechat_article" role="tab"
+                        aria-selected="true">公众号正文</button>
+                    <button class="output-tab" type="button" data-output-mode="social_cards" role="tab"
+                        aria-selected="false">小红书文字图</button>
+                </div>
+                <div class="preview-status-bar">
+                    <span id="draft-status">草稿未保存</span>
+                    <span id="generation-status">尚未生成预览</span>
+                </div>
             </div>
-            <iframe id="preview-frame" class="is-hidden"></iframe>
+            <div class="output-panel is-active" data-output-panel="wechat_article">
+                <div>
+                    <div class="output-title">公众号正文</div>
+                    <div id="wechat-output-status" class="output-status">尚未生成预览</div>
+                </div>
+                <button id="generate-btn" class="btn btn-primary">生成预览</button>
+            </div>
+            <div class="output-panel" data-output-panel="social_cards">
+                <div>
+                    <div class="output-title">小红书文字图</div>
+                    <div id="social-output-status" class="output-status">尚未生成文字图</div>
+                </div>
+                <div class="output-actions-inline">
+                    <select id="social-preset-select" class="social-preset-select" aria-label="文字图排版策略">
+                        <option value="balanced">图文均衡</option>
+                        <option value="longform">长文连载</option>
+                        <option value="image_first">图片优先</option>
+                        <option value="quote_digest">观点摘录</option>
+                    </select>
+                    <button id="social-image-btn" class="btn btn-secondary btn-social">生成文字图</button>
+                </div>
+            </div>
+            <div id="social-export-panel" class="social-export-panel is-hidden"></div>
+            <div id="social-quality-panel" class="social-quality-panel is-hidden"></div>
+            <div id="social-layout-controls" class="social-layout-controls is-hidden"></div>
+            <div class="preview-surface">
+                <div id="empty-preview" class="empty-state">
+                    <div id="empty-preview-title">公众号正文预览</div>
+                    <div id="empty-preview-detail">尚未生成</div>
+                </div>
+                <iframe id="preview-frame" class="is-hidden"></iframe>
+            </div>
         </div>
     </div>
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <h2>Settings</h2>
+            <h2>设置</h2>
             <div class="form-group">
-                <label>WeChat AppID</label>
+                <label>微信公众号 AppID</label>
                 <input type="text" id="st-appid" placeholder="wx...">
             </div>
             <div class="form-group">
-                <label>AppSecret</label>
+                <label>微信公众号 AppSecret</label>
                 <input type="password" id="st-secret">
             </div>
             <div class="form-group">
-                <label>Author Name</label>
-                <input type="text" id="st-author" placeholder="Your Name">
+                <label>作者名</label>
+                <input type="text" id="st-author" placeholder="你的名字">
+            </div>
+            <div class="form-group">
+                <label>文字图左上标签</label>
+                <input type="text" id="st-brand-name" placeholder="例如：有限理性">
+            </div>
+            <div class="form-group">
+                <label>文字图英文标签</label>
+                <input type="text" id="st-brand-en" placeholder="例如：BOUNDED RATIONALITY">
+            </div>
+            <div class="form-group">
+                <label>标签变色文字</label>
+                <input type="text" id="st-brand-accent" placeholder="例如：理性">
             </div>
             <div class="modal-actions">
-                <button id="settings-close-btn" class="btn btn-secondary">Cancel</button>
-                <button id="settings-save-btn" class="btn btn-primary">Save</button>
+                <button id="settings-close-btn" class="btn btn-secondary">取消</button>
+                <button id="settings-save-btn" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publish Check Modal -->
+    <div id="publish-check-modal" class="modal">
+        <div class="modal-content">
+            <h2>发布前检查</h2>
+            <div id="publish-check-list" class="check-list"></div>
+            <div class="modal-actions">
+                <button id="publish-check-cancel-btn" class="btn btn-secondary">取消</button>
+                <button id="publish-check-confirm-btn" class="btn btn-primary">确认发布</button>
             </div>
         </div>
     </div>
@@ -114,6 +178,7 @@
     <script src="{{ url_for('static', filename='js/api.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dom.js') }}"></script>
     <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/drafts.js') }}"></script>
     <script src="{{ url_for('static', filename='js/generation.js') }}"></script>
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
