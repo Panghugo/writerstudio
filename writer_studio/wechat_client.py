@@ -38,7 +38,7 @@ class WeChatClient:
                 )
                 response.raise_for_status()
                 resp = response.json()
-            except Exception as e:
+            except requests.RequestException as e:
                 self.last_error = f"连接微信 API 失败：{type(e).__name__}。请检查网络、代理或稍后重试。"
                 print(f"❌ {self.last_error} (attempt {attempt + 1}/2)")
                 if attempt == 0:
@@ -103,8 +103,8 @@ class WeChatClient:
             self.last_error = f"图片上传失败：{resp.get('errcode', 'unknown')} {resp.get('errmsg', resp)}"
             print(f"   ❌ {self.last_error}")
             return None
-        except Exception as e:
-            self.last_error = f"图片上传网络错误：{type(e).__name__}"
+        except (requests.RequestException, OSError) as e:
+            self.last_error = f"图片上传失败（网络或文件读取错误）：{type(e).__name__}"
             print(f"   ❌ {self.last_error}")
             return None
 
@@ -125,7 +125,7 @@ class WeChatClient:
             )
             resp.raise_for_status()
             return resp.json()
-        except Exception as e:
+        except requests.RequestException as e:
             self.last_error = f"提交草稿网络错误：{type(e).__name__}"
             print(f"\n❌ {self.last_error}")
             return None

@@ -10,7 +10,7 @@ window.WriterStudioPublishing = (() => {
         }
 
         console.log("Publishing draft...");
-        setButtonBusy(dom.wechatPublishBtn, true, '发布中...');
+        dom.setButtonBusy(dom.wechatPublishBtn, true, '发布中...');
         notify('Publishing...', 'success');
 
         try {
@@ -32,7 +32,7 @@ window.WriterStudioPublishing = (() => {
             console.error(e);
             notify('Publish error', 'error');
         } finally {
-            setButtonBusy(dom.wechatPublishBtn, false);
+            dom.setButtonBusy(dom.wechatPublishBtn, false);
         }
     }
 
@@ -40,7 +40,7 @@ window.WriterStudioPublishing = (() => {
         if (!confirm('Sync this article to your personal blog (local)?')) return;
 
         const author_name = settings.getAuthorName('Hugo');
-        setButtonBusy(dom.blogPublishBtn, true, '同步中...');
+        dom.setButtonBusy(dom.blogPublishBtn, true, '同步中...');
         notify('Syncing to blog...', 'success');
 
         try {
@@ -55,7 +55,7 @@ window.WriterStudioPublishing = (() => {
             console.error(e);
             notify('Network error during sync', 'error');
         } finally {
-            setButtonBusy(dom.blogPublishBtn, false);
+            dom.setButtonBusy(dom.blogPublishBtn, false);
         }
     }
 
@@ -123,21 +123,6 @@ window.WriterStudioPublishing = (() => {
 
         row.append(icon, label);
         return row;
-    }
-
-    function setButtonBusy(button, isBusy, busyText) {
-        if (!button) return;
-        if (isBusy) {
-            button.dataset.defaultText = button.textContent;
-            button.textContent = busyText;
-            button.disabled = true;
-            button.classList.add('is-busy');
-            return;
-        }
-
-        button.textContent = button.dataset.defaultText || button.textContent;
-        button.disabled = false;
-        button.classList.remove('is-busy');
     }
 
     return {

@@ -18,6 +18,10 @@ def generate_articles(target_md=None, input_dir="input", output_dir="output", st
     os.makedirs(input_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
 
+    # 资源文件名用行号(index)保证同次生成内唯一；run_stamp 仅用于区分不同生成批次，
+    # 不再依赖 time.time() 的单调性来避免碰撞。
+    run_stamp = int(time.time())
+
     if target_md:
         files = [target_md]
     else:
@@ -52,7 +56,7 @@ def generate_articles(target_md=None, input_dir="input", output_dir="output", st
 
         for index, raw_line in enumerate(lines):
             line = raw_line.strip()
-            timestamp = int(time.time() * 10000) + index
+            timestamp = f"{run_stamp}_{index}"
 
             if line.startswith("# "):
                 title_text = auto_format_text(line.replace("# ", "").strip())

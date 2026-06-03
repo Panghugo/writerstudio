@@ -2,6 +2,7 @@ import math
 import os
 import textwrap
 from datetime import datetime
+from functools import lru_cache
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -34,9 +35,16 @@ def get_font_path():
     return None
 
 
+@lru_cache(maxsize=128)
+def _truetype_cached(path, size):
+    return ImageFont.truetype(path, size)
+
+
 def load_font(size):
     path = get_font_path()
-    return ImageFont.truetype(path, size) if path else ImageFont.load_default()
+    if not path:
+        return ImageFont.load_default()
+    return _truetype_cached(path, size)
 
 
 def process_text_lines(text, max_chars=15):
@@ -259,8 +267,8 @@ def draw_header(text, save_path, read_time_mins, asset_dir="input"):
                     final_x = margin
                 feature_img = feature_img.resize((target_w, new_h), Image.LANCZOS)
                 img.paste(feature_img, (final_x, text_end_y), feature_img)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"⚠️ 特性图加载失败 ({feature_path}): {type(e).__name__}: {e}")
     elif available_h > 200:
         cx, cy, r = w // 2, text_end_y + (available_h // 2), 80
         draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)], outline=STYLE["header_text_color"], width=1)
@@ -280,7 +288,8 @@ def draw_heading_gif(text, save_path, index):
     font, num_font = load_font(STYLE["h_font_size"]), load_font(STYLE["h_num_font_size"])
     w, cx = STYLE["canvas_width"], STYLE["canvas_width"] // 2
     lines = process_text_lines(text)
-    total_text_h = sum([get_rich_bbox(line, font)[3] - get_rich_bbox(line, font)[1] for line in lines]) + (len(lines) * 25) - 25
+    line_bboxes = [get_rich_bbox(line, font) for line in lines]
+    total_text_h = sum(bbox[3] - bbox[1] for bbox in line_bboxes) + (len(lines) * 25) - 25
     img_h = STYLE["h_padding_top"] + (STYLE["h_num_radius"] * 2) + STYLE["h_text_gap"] + total_text_h + STYLE["h_padding_bottom"]
     frames = []
     for f in range(STYLE["gif_frames"]):
@@ -296,8 +305,7 @@ def draw_heading_gif(text, save_path, index):
         num_bbox = num_font.getbbox(num_text)
         draw.text((cx - (num_bbox[2] - num_bbox[0]) // 2, cy - (num_bbox[3] - num_bbox[1]) // 2 - num_bbox[1] - 2), num_text, font=num_font, fill=STYLE["h_num_color"])
         cy_t = cy + br + STYLE["h_text_gap"]
-        for line in lines:
-            line_bbox = get_rich_bbox(line, font)
+        for line, line_bbox in zip(lines, line_bboxes):
             draw_rich_text(
                 draw, cx - (line_bbox[2] - line_bbox[0]) // 2, cy_t, line,
                 font=font,
@@ -314,9 +322,10 @@ def draw_quote(text, save_path):
     text = text.replace('**', '\x01')
     font = load_font(STYLE["q_font_size"])
     w = STYLE["canvas_width"]
-    qm_font = ImageFont.truetype(get_font_path(), STYLE["q_font_size"] * 4) if get_font_path() else font
+    qm_font = load_font(STYLE["q_font_size"] * 4)
     lines = process_text_lines(text, (w - STYLE["q_padding_x"] * 2) // STYLE["q_font_size"])
-    total_h = sum([get_rich_bbox(line, font)[3] - get_rich_bbox(line, font)[1] for line in lines]) + (len(lines) * STYLE["q_line_spacing"]) - STYLE["q_line_spacing"]
+    line_bboxes = [get_rich_bbox(line, font) for line in lines]
+    total_h = sum(bbox[3] - bbox[1] for bbox in line_bboxes) + (len(lines) * STYLE["q_line_spacing"]) - STYLE["q_line_spacing"]
     img_h = total_h + (STYLE["q_deco_gap"] * 2)
     mask = Image.new("L", (w, img_h), 0)
     draw_mask = ImageDraw.Draw(mask)
@@ -336,8 +345,7 @@ def draw_quote(text, save_path):
         draw.regular_polygon((w // 2, y, 6), 4, rotation=0, fill=STYLE["q_line_color"])
     cy = (img_h - total_h) // 2
     bold_state = False
-    for line in lines:
-        line_bbox = get_rich_bbox(line, font)
+    for line, line_bbox in zip(lines, line_bboxes):
         lx = w - (line_bbox[2] - line_bbox[0]) - (STYLE["q_padding_x"] + 20) if line.startswith(("——", "--")) else (w - (line_bbox[2] - line_bbox[0])) // 2
         bold_state = draw_rich_text(
             draw, lx, cy, line,

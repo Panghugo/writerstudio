@@ -1,6 +1,6 @@
 window.WriterStudioGeneration = (() => {
     async function saveAndGenerate({ api, dom, settings, sessionId, notify, drafts, onSuccess }) {
-        setButtonBusy(dom.generateBtn, true, '生成中...');
+        dom.setButtonBusy(dom.generateBtn, true, '生成中...');
         notify('正在生成预览...', 'success');
         const config = settings.getConfig();
 
@@ -30,12 +30,12 @@ window.WriterStudioGeneration = (() => {
             console.error(e);
             notify('网络错误', 'error');
         } finally {
-            setButtonBusy(dom.generateBtn, false);
+            dom.setButtonBusy(dom.generateBtn, false);
         }
     }
 
     async function generateSocialImage({ api, dom, settings, sessionId, notify, layoutOverrides, blockControls, socialPreset, onSuccess }) {
-        setButtonBusy(dom.socialImageBtn, true, '生成中...');
+        dom.setButtonBusy(dom.socialImageBtn, true, '生成中...');
         notify('正在生成文字图...', 'success');
         const config = settings.getConfig();
 
@@ -79,24 +79,9 @@ window.WriterStudioGeneration = (() => {
             console.error(e);
             notify('网络错误', 'error');
         } finally {
-            setButtonBusy(dom.socialImageBtn, false);
+            dom.setButtonBusy(dom.socialImageBtn, false);
         }
         return null;
-    }
-
-    function setButtonBusy(button, isBusy, busyText) {
-        if (!button) return;
-        if (isBusy) {
-            button.dataset.defaultText = button.textContent;
-            button.textContent = busyText;
-            button.disabled = true;
-            button.classList.add('is-busy');
-            return;
-        }
-
-        button.textContent = button.dataset.defaultText || button.textContent;
-        button.disabled = false;
-        button.classList.remove('is-busy');
     }
 
     function renderWechatPreview(frame, previewUrl, cacheToken) {
@@ -215,7 +200,6 @@ window.WriterStudioGeneration = (() => {
         saveAndGenerate,
         generateSocialImage,
         renderWechatPreview,
-        renderSocialPreview,
-        setButtonBusy
+        renderSocialPreview
     };
 })();

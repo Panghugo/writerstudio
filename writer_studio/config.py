@@ -31,15 +31,10 @@ def load_publisher_config(verbose=False):
         "app_secret": "",
         "author_name": "",
         "use_proxy": False,
+        "proxy_url": "",
     }
-    if not os.path.exists(CONFIG_PATH):
-        return config
-
-    try:
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            config.update(json.load(f))
-            if verbose:
-                print("✅ 已加载本地配置 (config.json)")
-    except Exception:
-        pass
+    server_config = load_server_config()
+    config.update(server_config)
+    if verbose and server_config:
+        print("✅ 已加载本地配置 (config.json)")
     return config

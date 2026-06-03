@@ -3,7 +3,9 @@ import os
 from .renderers.wechat_article import markdown_to_wechat_html
 
 
-UPLOADABLE_IMAGE_EXTENSIONS = ('.png', '.jpg', '.gif')
+# 微信图文素材只接受 png/jpg/jpeg/gif。这里有意比 config.ALLOWED_IMAGE_EXTENSIONS 更窄：
+# Web 端允许用户上传 webp/svg 用于本地预览，但微信不支持，扫描素材上传时会跳过它们。
+UPLOADABLE_IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.gif')
 
 
 def upload_assets(assets_dir, upload_image):
