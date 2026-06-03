@@ -21,7 +21,7 @@ from .obsidian import (
     list_markdown_files as list_obsidian_markdown_files,
     load_markdown_file as load_obsidian_markdown_file,
 )
-from .renderers.social_cards import create_social_cards, extract_social_image_text
+from .renderers.social_cards import create_social_cards
 from .themes import build_style
 from .wechat_publisher import WeChatPublisher
 
@@ -401,8 +401,8 @@ def save_feature_image(file, input_dir):
         if os.path.exists(old_path):
             try:
                 os.remove(old_path)
-            except Exception:
-                pass
+            except OSError as e:
+                print(f"⚠️ 无法删除旧头图 {old_path}: {type(e).__name__}: {e}")
 
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in ['.png', '.jpg', '.jpeg']:

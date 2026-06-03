@@ -1,4 +1,5 @@
 import os
+from functools import wraps
 
 from flask import Flask, jsonify, render_template, request, send_from_directory
 from flask_cors import CORS
@@ -25,42 +26,44 @@ def create_app():
 
 
 def register_routes(flask_app):
+    def json_api(handler):
+        """统一处理 JSON API 路由的异常映射：
+        ValueError→400，FileNotFoundError→404，其余→500。
+        被装饰函数直接返回结果 dict，由装饰器负责 jsonify。"""
+        @wraps(handler)
+        def wrapper(*args, **kwargs):
+            try:
+                return jsonify(handler(*args, **kwargs))
+            except ValueError as e:
+                return error_response(flask_app, e, 400)
+            except FileNotFoundError as e:
+                return error_response(flask_app, e, 404)
+            except Exception as e:
+                return error_response(flask_app, e, 500)
+        return wrapper
+
     @flask_app.route('/')
     def index():
         config = load_server_config()
         return render_template('index.html', config=config)
 
     @flask_app.route('/api/save_and_generate', methods=['POST'])
+    @json_api
     def save_and_generate():
-        try:
-            data = request.get_json(silent=True) or {}
-            return jsonify(web_services.generate_preview(data))
-        except ValueError as e:
-            return error_response(flask_app, e, 400)
-        except FileNotFoundError as e:
-            return error_response(flask_app, e, 404)
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        data = request.get_json(silent=True) or {}
+        return web_services.generate_preview(data)
 
     @flask_app.route('/api/generate_social_image', methods=['POST'])
+    @json_api
     def generate_social_image():
-        try:
-            data = request.get_json(silent=True) or {}
-            return jsonify(web_services.generate_social_image(data))
-        except ValueError as e:
-            return error_response(flask_app, e, 400)
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        data = request.get_json(silent=True) or {}
+        return web_services.generate_social_image(data)
 
     @flask_app.route('/api/publish', methods=['POST'])
+    @json_api
     def publish():
-        try:
-            data = request.get_json(silent=True) or {}
-            return jsonify(web_services.publish_wechat(data))
-        except ValueError as e:
-            return error_response(flask_app, e, 400)
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        data = request.get_json(silent=True) or {}
+        return web_services.publish_wechat(data)
 
     @flask_app.route('/api/save_config', methods=['POST'])
     def save_config():
@@ -88,58 +91,38 @@ def register_routes(flask_app):
             return jsonify({'error': str(e)}), 400
 
     @flask_app.route('/api/remove_feature_image', methods=['POST'])
+    @json_api
     def remove_feature_image():
-        try:
-            data = request.get_json(silent=True) or {}
-            return jsonify(web_services.remove_feature_image(data))
-        except ValueError as e:
-            return error_response(flask_app, e, 400)
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        data = request.get_json(silent=True) or {}
+        return web_services.remove_feature_image(data)
 
     @flask_app.route('/api/publish_blog', methods=['POST'])
+    @json_api
     def publish_blog():
-        try:
-            data = request.get_json(silent=True) or {}
-            return jsonify(web_services.publish_blog(data))
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        data = request.get_json(silent=True) or {}
+        return web_services.publish_blog(data)
 
     @flask_app.route('/api/open_output_folder', methods=['POST'])
+    @json_api
     def open_output_folder():
-        try:
-            data = request.get_json(silent=True) or {}
-            return jsonify(web_services.open_output_folder(data))
-        except FileNotFoundError as e:
-            return error_response(flask_app, e, 404)
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        data = request.get_json(silent=True) or {}
+        return web_services.open_output_folder(data)
 
     @flask_app.route('/api/list_obsidian_files', methods=['GET'])
+    @json_api
     def list_obsidian_files():
-        try:
-            return jsonify({"status": "success", "files": web_services.list_obsidian_files()})
-        except FileNotFoundError as e:
-            return error_response(flask_app, e, 404)
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        return {"status": "success", "files": web_services.list_obsidian_files()}
 
     @flask_app.route('/api/load_obsidian_file', methods=['POST'])
+    @json_api
     def load_obsidian_file():
-        try:
-            data = request.get_json(silent=True) or {}
-            obsidian_file = web_services.load_obsidian_file(data)
-            return jsonify({
-                "status": "success",
-                "content": obsidian_file["content"],
-                "filename": obsidian_file["filename"],
-            })
-        except ValueError as e:
-            return error_response(flask_app, e, 400)
-        except FileNotFoundError as e:
-            return error_response(flask_app, e, 404)
-        except Exception as e:
-            return error_response(flask_app, e, 500)
+        data = request.get_json(silent=True) or {}
+        obsidian_file = web_services.load_obsidian_file(data)
+        return {
+            "status": "success",
+            "content": obsidian_file["content"],
+            "filename": obsidian_file["filename"],
+        }
 
 
 def error_response(flask_app, error, status_code):

@@ -7,7 +7,23 @@ window.WriterStudioDom = (() => {
         return Array.from(document.querySelectorAll(selector));
     }
 
+    function setButtonBusy(button, isBusy, busyText) {
+        if (!button) return;
+        if (isBusy) {
+            button.dataset.defaultText = button.textContent;
+            button.textContent = busyText;
+            button.disabled = true;
+            button.classList.add('is-busy');
+            return;
+        }
+
+        button.textContent = button.dataset.defaultText || button.textContent;
+        button.disabled = false;
+        button.classList.remove('is-busy');
+    }
+
     return {
+        setButtonBusy,
         editor: qs('#markdown-editor'),
         previewFrame: qs('#preview-frame'),
         emptyPreview: qs('#empty-preview'),

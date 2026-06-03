@@ -6,10 +6,16 @@ from .wechat_draft import build_article_data, upload_assets
 from .wechat_format import markdown_to_wechat_html
 
 
-PROXY_CONFIG = {
-    "http": "socks5://127.0.0.1:7890",
-    "https": "socks5://127.0.0.1:7890",
-}
+DEFAULT_PROXY_URL = "socks5://127.0.0.1:7890"
+
+
+def _build_proxies(proxy_url):
+    url = (proxy_url or "").strip() or DEFAULT_PROXY_URL
+    return {"http": url, "https": url}
+
+
+# 向后兼容：旧代码（如 publisher.py）仍从这里 import PROXY_CONFIG，保持默认代理配置。
+PROXY_CONFIG = _build_proxies(None)
 
 
 class WeChatPublisher:
@@ -18,7 +24,7 @@ class WeChatPublisher:
         self.app_id = config["app_id"] if app_id is None else app_id
         self.app_secret = config["app_secret"] if app_secret is None else app_secret
         self.use_proxy = config["use_proxy"] if use_proxy is None else use_proxy
-        self.proxies = PROXY_CONFIG if self.use_proxy else None
+        self.proxies = _build_proxies(config.get("proxy_url")) if self.use_proxy else None
         self.last_error = ""
         self.client = WeChatClient(self.app_id, self.app_secret, proxies=self.proxies)
         if self.use_proxy:

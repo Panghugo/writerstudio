@@ -86,6 +86,7 @@ cp config.template.json config.json
   "app_secret": "",
   "author_name": "作者",
   "use_proxy": 0,
+  "proxy_url": "socks5://127.0.0.1:7890",
   "obsidian_vault_path": "",
   "obsidian_attachments_folder": "attachments"
 }
@@ -96,6 +97,7 @@ cp config.template.json config.json
 - `app_id`、`app_secret`：微信公众号后台的开发者凭证。
 - `author_name`：默认作者名。
 - `use_proxy`：是否让微信 API 请求走代理。
+- `proxy_url`：代理地址，`use_proxy` 开启时生效；留空则用默认 `socks5://127.0.0.1:7890`。
 - `obsidian_vault_path`：Obsidian vault 路径。
 - `obsidian_attachments_folder`：Obsidian 附件目录名。
 
