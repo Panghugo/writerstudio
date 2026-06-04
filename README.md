@@ -115,8 +115,12 @@ cp config.template.json config.json
 
 - `compileall`：检查 `app.py`、`web.py`、`publisher.py`、`writer_studio`、`scripts` 是否能编译。
 - `scripts/smoke_test.py`：Web 生成链路烟测。
+- `scripts/check_web_services_offline.py`：Web 服务层离线检查。
 - `scripts/check_text_formatting.py`：文本格式化检查。
 - `scripts/check_publisher_offline.py`：公众号发布离线回归检查。
+- `scripts/check_pipeline_offline.py`：文章生成分块与资源命名检查。
+- `scripts/check_renderer_offline.py`：渲染器字体缓存与绘制检查。
+- `scripts/check_wechat_client_offline.py`：公众号 API 客户端网络层离线检查。
 - `node --check static/js/*.js`：前端 JavaScript 语法检查；如果本机没有 `node`，会提示并跳过。
 
 ## 常见问题
