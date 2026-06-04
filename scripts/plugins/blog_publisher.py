@@ -1,9 +1,21 @@
 import os
 import re
 import datetime
+import json
 
 # Target blog directory (Hardcoded for this user, could be config)
 BLOG_POSTS_DIR = "/Users/hugo/personal-blog/posts"
+
+
+def _yaml_scalar(value):
+    """Render a value as a safe YAML scalar.
+
+    A JSON string literal is also a valid YAML double-quoted scalar, so this
+    escapes newlines/quotes and prevents user input (e.g. author) from
+    injecting additional frontmatter fields.
+    """
+    return json.dumps(str(value), ensure_ascii=False)
+
 
 def publish_to_blog(title, content, author="Hugo", custom_slug=None):
     """
@@ -39,12 +51,13 @@ def publish_to_blog(title, content, author="Hugo", custom_slug=None):
     # Generate simple excerpt (first 100 chars of text content)
     clean_text = re.sub(r'[#*`\[\]]', '', content)[:150].replace('\n', ' ').strip() + "..."
     
-    # Construct Frontmatter
+    # Construct Frontmatter (values JSON-encoded -> safe YAML double-quoted
+    # scalars, so newlines/quotes in user input can't inject extra fields)
     frontmatter = f"""---
-title: {title}
-excerpt: {clean_text}
+title: {_yaml_scalar(title)}
+excerpt: {_yaml_scalar(clean_text)}
 date: {date_str}
-author: {author}
+author: {_yaml_scalar(author)}
 published: true
 ---
 
