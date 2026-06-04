@@ -55,6 +55,14 @@ cd /Users/hugo/Documents/Writer_Studio
 ./venv/bin/python3 web.py
 ```
 
+默认只监听本机 `127.0.0.1`，避免在局域网上无鉴权暴露（本服务会用到公众号凭证、读写本地文件并可触发 git push）。如需让同一局域网的其它设备访问：
+
+```bash
+WRITER_STUDIO_HOST=0.0.0.0 ./venv/bin/python3 web.py
+```
+
+Docker 镜像用 gunicorn 绑定 `0.0.0.0`，不受该默认值影响。
+
 如需登录后自动启动：
 
 ```bash
