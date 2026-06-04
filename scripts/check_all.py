@@ -25,6 +25,9 @@ CHECKS = [
     [PYTHON, "scripts/check_web_services_offline.py"],
     [PYTHON, "scripts/check_text_formatting.py"],
     [PYTHON, "scripts/check_publisher_offline.py"],
+    [PYTHON, "scripts/check_pipeline_offline.py"],
+    [PYTHON, "scripts/check_renderer_offline.py"],
+    [PYTHON, "scripts/check_wechat_client_offline.py"],
 ]
 
 
