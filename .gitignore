@@ -17,3 +17,6 @@ dist/
 build/
 *.spec
 config.json
+
+# Local scratch from unrelated tooling (not project source)
+.codex_docx_work/
